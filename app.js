@@ -1,11 +1,11 @@
-// Complete Application Controller with Individual Gear Configuration, Position (X, Y), Colors, and Perpendicular Setscrew
+// Application Controller: CAD Interaction, Split Viewport, Native Mobile Share & GitHub In-App Updater
 
 let viewer = null;
 let currentTheme = 'dark';
 let activeGearId = 'gear_1';
 let isGearTrainEnabled = false;
 
-// Default Gears with complete individual parameters
+// Default Gears Definition
 let gears = [
   {
     id: 'gear_1',
@@ -16,12 +16,12 @@ let gears = [
     pressureAngle: 20,
     faceWidth: 15,
     boreDiameter: 12,
+    hasKeyway: true,
+    keywayWidth: 4,
+    keywayDepth: 2.5,
     hasHub: true,
     hubDiameter: 26,
     hubLength: 12,
-    hasSetscrew: true,
-    setscrewSize: 4, // M4
-    setscrewDistance: 6, // Distance from hub base along shaft
     helixAngle: 15,
     bevelAngle: 25,
     color: '#3b82f6',
@@ -33,19 +33,19 @@ let gears = [
   },
   {
     id: 'gear_2',
-    name: 'چرخ‌دنده ۲',
+    name: 'چرخ‌دنده ۲ (پینیون)',
     type: 'spur',
     module: 2.5,
     numTeeth: 36,
     pressureAngle: 20,
     faceWidth: 15,
     boreDiameter: 14,
+    hasKeyway: true,
+    keywayWidth: 5,
+    keywayDepth: 2.8,
     hasHub: true,
     hubDiameter: 28,
     hubLength: 12,
-    hasSetscrew: false,
-    setscrewSize: 4,
-    setscrewDistance: 6,
     helixAngle: 15,
     bevelAngle: 25,
     color: '#10b981',
@@ -58,19 +58,18 @@ let gears = [
 ];
 
 document.addEventListener('DOMContentLoaded', () => {
-  I18N.setLang('fa');
-
   const canvas = document.getElementById('canvas3d');
   viewer = new Gear3DViewer(canvas);
 
-  setupMobileEvents();
-  setupNavigationEvents();
-  setupTabEvents();
+  setupCadViewToolbar();
+  setupTabs();
   setupGearSelectorDropdown();
-  setupGearParameterEvents();
-  setupKinematicsEvents();
-  setupViewportHudEvents();
-  setupExportModalEvents();
+  setupParameterSync();
+  setupKinematics();
+  setupMaterialPicker();
+  setupExportersAndSharing();
+  setupInAppUpdateChecker();
+  setupThemeToggle();
 
   refreshGearAssembly();
 });
@@ -84,6 +83,90 @@ function getActiveGear() {
   return list.find(g => g.id === activeGearId) || list[0];
 }
 
+// 1. Evolvent Design CAD View Toolbar Buttons
+function setupCadViewToolbar() {
+  const viewIsoBtn = document.getElementById('viewIsoBtn');
+  const viewTopBtn = document.getElementById('viewTopBtn');
+  const viewFrontBtn = document.getElementById('viewFrontBtn');
+  const viewSideBtn = document.getElementById('viewSideBtn');
+  const resetCamBtn = document.getElementById('resetCamBtn');
+  const toggleEdgesBtn = document.getElementById('toggleEdgesBtn');
+  const toggleDimsBtn = document.getElementById('toggleDimsBtn');
+  const simPlayBtn = document.getElementById('simPlayBtn');
+
+  const viewBtns = [viewIsoBtn, viewTopBtn, viewFrontBtn, viewSideBtn];
+  function setActiveViewBtn(btn) {
+    viewBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+
+  viewIsoBtn.addEventListener('click', () => {
+    setActiveViewBtn(viewIsoBtn);
+    viewer.setView('iso');
+  });
+
+  viewTopBtn.addEventListener('click', () => {
+    setActiveViewBtn(viewTopBtn);
+    viewer.setView('top');
+  });
+
+  viewFrontBtn.addEventListener('click', () => {
+    setActiveViewBtn(viewFrontBtn);
+    viewer.setView('front');
+  });
+
+  viewSideBtn.addEventListener('click', () => {
+    setActiveViewBtn(viewSideBtn);
+    viewer.setView('side');
+  });
+
+  resetCamBtn.addEventListener('click', () => {
+    setActiveViewBtn(viewIsoBtn);
+    viewer.resetView();
+  });
+
+  toggleEdgesBtn.addEventListener('click', () => {
+    toggleEdgesBtn.classList.toggle('active');
+    viewer.toggleEdges(toggleEdgesBtn.classList.contains('active'));
+  });
+
+  toggleDimsBtn.addEventListener('click', () => {
+    toggleDimsBtn.classList.toggle('active');
+    viewer.toggleDimensions(toggleDimsBtn.classList.contains('active'));
+  });
+
+  simPlayBtn.addEventListener('click', () => {
+    viewer.isRunning = !viewer.isRunning;
+    simPlayBtn.classList.toggle('active', viewer.isRunning);
+    const icon = document.getElementById('simPlayIcon');
+    if (viewer.isRunning) {
+      icon.innerHTML = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+    } else {
+      icon.innerHTML = '<polygon points="8,5 19,12 8,19"/>';
+    }
+  });
+}
+
+// 2. Tab Navigation
+function setupTabs() {
+  const tabBtns = document.querySelectorAll('.tab-btn');
+  const tabContents = document.querySelectorAll('.tab-content');
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetTab = btn.getAttribute('data-tab');
+
+      tabBtns.forEach(b => b.classList.remove('active'));
+      tabContents.forEach(c => c.classList.remove('active'));
+
+      btn.classList.add('active');
+      const targetContent = document.getElementById(targetTab);
+      if (targetContent) targetContent.classList.add('active');
+    });
+  });
+}
+
+// 3. Gear Dropdown Selector
 function setupGearSelectorDropdown() {
   const selector = document.getElementById('activeGearSelector');
   if (!selector) return;
@@ -98,513 +181,506 @@ function setupGearSelectorDropdown() {
     selector.appendChild(opt);
   });
 
-  selector.onchange = (e) => {
+  selector.addEventListener('change', (e) => {
     activeGearId = e.target.value;
-    syncInputsWithActiveGear();
-    updateGearSpecsDisplay();
-  };
-}
-
-function syncInputsWithActiveGear() {
-  const g = getActiveGear();
-  if (!g) return;
-
-  document.getElementById('gearNameInput').value = g.name || '';
-  document.getElementById('gearTypeSelect').value = g.type || 'spur';
-  document.getElementById('paramModule').value = g.module;
-  document.getElementById('paramTeeth').value = g.numTeeth;
-  document.getElementById('paramTeethSlider').value = g.numTeeth;
-  document.getElementById('teethValDisplay').textContent = g.numTeeth;
-  document.getElementById('paramPressureAngle').value = g.pressureAngle;
-  document.getElementById('paramFaceWidth').value = g.faceWidth;
-  document.getElementById('paramBoreDiameter').value = g.boreDiameter;
-  document.getElementById('paramColor').value = g.color || '#3b82f6';
-
-  // Position inputs
-  document.getElementById('paramPosX').value = g.posX || 0;
-  document.getElementById('paramPosY').value = g.posY || 0;
-
-  // Hub & Setscrew inputs
-  document.getElementById('enableHubCheck').checked = !!g.hasHub;
-  document.getElementById('hubControls').style.display = g.hasHub ? 'block' : 'none';
-  document.getElementById('paramHubDiameter').value = g.hubDiameter || 26;
-  document.getElementById('paramHubLength').value = g.hubLength || 12;
-
-  document.getElementById('enableSetscrewCheck').checked = !!g.hasSetscrew;
-  document.getElementById('paramSetscrewSize').value = g.setscrewSize || 4;
-  document.getElementById('paramSetscrewDist').value = g.setscrewDistance || 6;
-
-  // Helical / Bevel groups
-  document.getElementById('helixAngleGroup').style.display = (g.type === 'helical') ? 'block' : 'none';
-  document.getElementById('paramHelixAngle').value = g.helixAngle || 15;
-
-  document.getElementById('bevelAngleGroup').style.display = (g.type === 'bevel') ? 'block' : 'none';
-  document.getElementById('paramBevelAngle').value = g.bevelAngle || 25;
-}
-
-function refreshGearAssembly() {
-  const currentList = getActiveGearList();
-  const kinematics = GearMath.calculateKinematics(currentList);
-
-  setupGearSelectorDropdown();
-  syncInputsWithActiveGear();
-
-  viewer.updateGearTrain(currentList, kinematics);
-  renderKinematicsGearList(kinematics);
-  renderKinematicsBottomBar(kinematics);
-  updateGearSpecsDisplay();
-}
-
-function updateGearSpecsDisplay() {
-  const gear = getActiveGear();
-  if (!gear) return;
-
-  const d = gear.module * gear.numTeeth;
-  const da = d + 2 * gear.module;
-  const df = d - 2.5 * gear.module;
-  const p = Math.PI * gear.module;
-
-  document.getElementById('specPitchDia').textContent = `${d.toFixed(2)} mm`;
-  document.getElementById('specTipDia').textContent = `${da.toFixed(2)} mm`;
-  document.getElementById('specRootDia').textContent = `${df.toFixed(2)} mm`;
-  document.getElementById('specCircularPitch').textContent = `${p.toFixed(2)} mm`;
-
-  const list = getActiveGearList();
-  if (list.length > 1) {
-    const centerDist = Math.hypot(list[1].posX - list[0].posX, list[1].posY - list[0].posY);
-    document.getElementById('specCenterDist').textContent = `${centerDist.toFixed(2)} mm`;
-  } else {
-    document.getElementById('specCenterDist').textContent = 'تک چرخ‌دنده (Single)';
-  }
-}
-
-function renderKinematicsBottomBar(kinematics) {
-  const container = document.getElementById('kinematicsBadges');
-  if (!container) return;
-
-  container.innerHTML = '';
-  kinematics.forEach((k) => {
-    const badge = document.createElement('div');
-    badge.className = `kin-badge ${k.isDriver ? 'driver' : ''}`;
-    const dirText = k.direction > 0 ? '↻ CW' : '↺ CCW';
-    badge.innerHTML = `
-      <span>${k.name} (Z=${k.numTeeth}):</span>
-      <span class="kin-badge-val">${k.rpm} RPM (${dirText})</span>
-      ${k.isDriver ? '<span style="color:#10b981;font-size:10px;">(محرک)</span>' : ''}
-    `;
-    container.appendChild(badge);
+    syncControlsFromGear(getActiveGear());
   });
 }
 
-function renderKinematicsGearList(kinematics) {
-  const container = document.getElementById('gearTrainContainer');
-  if (!container) return;
+// 4. Parameter Synchronization
+function setupParameterSync() {
+  const currentGear = getActiveGear();
 
-  container.innerHTML = '';
-  const currentList = getActiveGearList();
-
-  currentList.forEach((g, idx) => {
-    const kin = kinematics[idx] || {};
-    const card = document.createElement('div');
-    card.style.cssText = "background:var(--current-bg);border:1px solid var(--current-border);border-radius:8px;padding:10px;margin-bottom:8px;";
-
-    card.innerHTML = `
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <span style="font-weight:700;font-size:12px;color:${g.color || 'var(--primary)'};">#${idx + 1} - ${g.name}</span>
-        <span style="background:${g.isDriver ? 'var(--secondary)' : 'var(--primary)'};color:white;font-size:10px;padding:2px 6px;border-radius:4px;">
-          ${g.isDriver ? 'محرک (Driver)' : 'متحرک (Driven)'}
-        </span>
-      </div>
-      <div style="font-size:11px;display:grid;grid-template-columns:1fr 1fr;gap:4px;">
-        <div>دندانه (Z): <b>${g.numTeeth}</b></div>
-        <div>مدول (m): <b>${g.module}</b></div>
-        <div>موقعیت: <b>X=${g.posX}, Y=${g.posY}</b></div>
-        <div style="color:var(--primary);font-weight:700;">سرعت: <b>${kin.rpm || 0} RPM</b></div>
-      </div>
-      <div style="display:flex;gap:6px;margin-top:8px;">
-        <button class="btn btn-sm" onclick="selectAndEditGear('${g.id}')" style="font-size:10px;padding:3px 6px;">
-          ویرایش پارامترها
-        </button>
-        <button class="btn btn-sm" onclick="setDriverGear('${g.id}')" style="font-size:10px;padding:3px 6px;">
-          تنظیم به محرک
-        </button>
-        ${isGearTrainEnabled && currentList.length > 1 ? `
-          <button class="btn btn-sm" onclick="removeGear('${g.id}')" style="color:var(--danger);font-size:10px;padding:3px 6px;">
-            حذف
-          </button>
-        ` : ''}
-      </div>
-    `;
-    container.appendChild(card);
-  });
-}
-
-window.selectAndEditGear = function(gearId) {
-  activeGearId = gearId;
-  syncInputsWithActiveGear();
-  updateGearSpecsDisplay();
-  // Switch to design tab
-  document.querySelector('[data-tab="tabDesign"]').click();
-};
-
-window.setDriverGear = function(gearId) {
-  gears.forEach(g => {
-    g.isDriver = (g.id === gearId);
-  });
-  refreshGearAssembly();
-};
-
-window.removeGear = function(gearId) {
-  if (gears.length <= 1) return;
-  gears = gears.filter(g => g.id !== gearId);
-  if (!gears.some(g => g.isDriver)) {
-    gears[0].isDriver = true;
-  }
-  activeGearId = gears[0].id;
-  refreshGearAssembly();
-};
-
-function setupMobileEvents() {
-  const drawerBtn = document.getElementById('mobileDrawerBtn');
-  const sidebar = document.querySelector('.sidebar');
-  if (drawerBtn && sidebar) {
-    drawerBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('mobile-open');
-    });
-  }
-}
-
-function setupNavigationEvents() {
-  document.getElementById('langToggleBtn').addEventListener('click', () => {
-    const nextLang = I18N.currentLang === 'fa' ? 'en' : 'fa';
-    I18N.setLang(nextLang);
+  // Module
+  bindRangeAndNumber('moduleRange', 'moduleInput', 'moduleVal', ' mm', (val) => {
+    getActiveGear().module = parseFloat(val);
     refreshGearAssembly();
   });
 
-  document.getElementById('themeToggleBtn').addEventListener('click', () => {
-    currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', currentTheme);
-    viewer.setTheme(currentTheme);
+  // Teeth
+  bindRangeAndNumber('numTeethRange', 'numTeethInput', 'numTeethVal', '', (val) => {
+    getActiveGear().numTeeth = parseInt(val);
+    refreshGearAssembly();
   });
-}
 
-function setupTabEvents() {
-  const tabBtns = document.querySelectorAll('.tab-btn');
-  tabBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      tabBtns.forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  // Face Width
+  bindRangeAndNumber('faceWidthRange', 'faceWidthInput', 'faceWidthVal', ' mm', (val) => {
+    getActiveGear().faceWidth = parseFloat(val);
+    refreshGearAssembly();
+  });
 
-      btn.classList.add('active');
-      const target = btn.getAttribute('data-tab');
-      const targetEl = document.getElementById(target);
-      if (targetEl) targetEl.classList.add('active');
+  // Pressure Angle
+  document.querySelectorAll('input[name="pressureAngle"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.querySelectorAll('.radio-label').forEach(lbl => lbl.classList.remove('active'));
+      e.target.closest('.radio-label').classList.add('active');
+      getActiveGear().pressureAngle = parseFloat(e.target.value);
+      refreshGearAssembly();
     });
   });
-}
 
-function setupGearParameterEvents() {
-  const nameInput = document.getElementById('gearNameInput');
-  const typeSelect = document.getElementById('gearTypeSelect');
-  const moduleInput = document.getElementById('paramModule');
-  const teethInput = document.getElementById('paramTeeth');
-  const teethSlider = document.getElementById('paramTeethSlider');
-  const pressureAngleSelect = document.getElementById('paramPressureAngle');
-  const faceWidthInput = document.getElementById('paramFaceWidth');
-  const boreDiameterInput = document.getElementById('paramBoreDiameter');
-  const colorInput = document.getElementById('paramColor');
+  // Gear Type
+  document.querySelectorAll('input[name="gearType"]').forEach(radio => {
+    radio.addEventListener('change', (e) => {
+      document.querySelectorAll('.pill-option').forEach(p => p.classList.remove('active'));
+      e.target.closest('.pill-option').classList.add('active');
+      const type = e.target.value;
+      getActiveGear().type = type;
 
-  // Position inputs
-  const posXInput = document.getElementById('paramPosX');
-  const posYInput = document.getElementById('paramPosY');
+      document.getElementById('helicalAngleGroup').style.display = (type === 'helical') ? 'block' : 'none';
+      document.getElementById('bevelAngleGroup').style.display = (type === 'bevel') ? 'block' : 'none';
 
-  // Hub & Setscrew inputs
-  const enableHubCheck = document.getElementById('enableHubCheck');
-  const hubControls = document.getElementById('hubControls');
-  const hubDiameterInput = document.getElementById('paramHubDiameter');
-  const hubLengthInput = document.getElementById('paramHubLength');
-  const enableSetscrewCheck = document.getElementById('enableSetscrewCheck');
-  const setscrewSizeSelect = document.getElementById('paramSetscrewSize');
-  const setscrewDistInput = document.getElementById('paramSetscrewDist');
-
-  const helixAngleGroup = document.getElementById('helixAngleGroup');
-  const helixAngleInput = document.getElementById('paramHelixAngle');
-  const bevelAngleGroup = document.getElementById('bevelAngleGroup');
-  const bevelAngleInput = document.getElementById('paramBevelAngle');
-
-  nameInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.name = e.target.value;
-    setupGearSelectorDropdown();
+      refreshGearAssembly();
+    });
   });
 
-  typeSelect.addEventListener('change', (e) => {
-    const g = getActiveGear();
-    g.type = e.target.value;
-    helixAngleGroup.style.display = (g.type === 'helical') ? 'block' : 'none';
-    bevelAngleGroup.style.display = (g.type === 'bevel') ? 'block' : 'none';
+  // Helical Angle
+  const helixRange = document.getElementById('helixAngleRange');
+  const helixVal = document.getElementById('helixAngleVal');
+  helixRange.addEventListener('input', (e) => {
+    helixVal.textContent = e.target.value + '°';
+    getActiveGear().helixAngle = parseFloat(e.target.value);
     refreshGearAssembly();
   });
 
-  teethSlider.addEventListener('input', (e) => {
-    teethInput.value = e.target.value;
-    const g = getActiveGear();
-    g.numTeeth = parseInt(e.target.value);
-    document.getElementById('teethValDisplay').textContent = e.target.value;
+  // Bevel Angle
+  const bevelRange = document.getElementById('bevelAngleRange');
+  const bevelVal = document.getElementById('bevelAngleVal');
+  bevelRange.addEventListener('input', (e) => {
+    bevelVal.textContent = e.target.value + '°';
+    getActiveGear().bevelAngle = parseFloat(e.target.value);
     refreshGearAssembly();
   });
 
-  teethInput.addEventListener('input', (e) => {
-    teethSlider.value = e.target.value;
-    const g = getActiveGear();
-    g.numTeeth = parseInt(e.target.value) || 12;
-    document.getElementById('teethValDisplay').textContent = g.numTeeth;
+  // Bore Diameter
+  bindRangeAndNumber('boreDiaRange', 'boreDiaInput', 'boreDiaVal', ' mm', (val) => {
+    getActiveGear().boreDiameter = parseFloat(val);
     refreshGearAssembly();
   });
 
-  moduleInput.addEventListener('input', (e) => {
-    const val = parseFloat(e.target.value) || 2.5;
-    const g = getActiveGear();
-    g.module = val;
+  // Keyway
+  const hasKeywayCheck = document.getElementById('hasKeywayCheck');
+  const keywaySettings = document.getElementById('keywaySettings');
+  const keywayWidthInput = document.getElementById('keywayWidthInput');
+  const keywayDepthInput = document.getElementById('keywayDepthInput');
+
+  hasKeywayCheck.addEventListener('change', (e) => {
+    getActiveGear().hasKeyway = e.target.checked;
+    keywaySettings.style.display = e.target.checked ? 'block' : 'none';
     refreshGearAssembly();
   });
 
-  pressureAngleSelect.addEventListener('change', (e) => {
-    const g = getActiveGear();
-    g.pressureAngle = parseFloat(e.target.value);
+  keywayWidthInput.addEventListener('input', (e) => {
+    getActiveGear().keywayWidth = parseFloat(e.target.value) || 0;
     refreshGearAssembly();
   });
 
-  faceWidthInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.faceWidth = parseFloat(e.target.value) || 15;
+  keywayDepthInput.addEventListener('input', (e) => {
+    getActiveGear().keywayDepth = parseFloat(e.target.value) || 0;
     refreshGearAssembly();
   });
 
-  boreDiameterInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.boreDiameter = parseFloat(e.target.value) || 10;
+  // Hub
+  const hasHubCheck = document.getElementById('hasHubCheck');
+  const hubSettings = document.getElementById('hubSettings');
+  const hubDiaInput = document.getElementById('hubDiaInput');
+  const hubLengthInput = document.getElementById('hubLengthInput');
+
+  hasHubCheck.addEventListener('change', (e) => {
+    getActiveGear().hasHub = e.target.checked;
+    hubSettings.style.display = e.target.checked ? 'block' : 'none';
     refreshGearAssembly();
   });
 
-  colorInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.color = e.target.value;
-    refreshGearAssembly();
-  });
-
-  // Position listeners
-  posXInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.posX = parseFloat(e.target.value) || 0;
-    refreshGearAssembly();
-  });
-
-  posYInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.posY = parseFloat(e.target.value) || 0;
-    refreshGearAssembly();
-  });
-
-  // Hub & Setscrew
-  enableHubCheck.addEventListener('change', (e) => {
-    const g = getActiveGear();
-    g.hasHub = e.target.checked;
-    hubControls.style.display = g.hasHub ? 'block' : 'none';
-    refreshGearAssembly();
-  });
-
-  hubDiameterInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.hubDiameter = parseFloat(e.target.value) || 26;
+  hubDiaInput.addEventListener('input', (e) => {
+    getActiveGear().hubDiameter = parseFloat(e.target.value) || 0;
     refreshGearAssembly();
   });
 
   hubLengthInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.hubLength = parseFloat(e.target.value) || 12;
-    refreshGearAssembly();
-  });
-
-  enableSetscrewCheck.addEventListener('change', (e) => {
-    const g = getActiveGear();
-    g.hasSetscrew = e.target.checked;
-    refreshGearAssembly();
-  });
-
-  setscrewSizeSelect.addEventListener('change', (e) => {
-    const g = getActiveGear();
-    g.setscrewSize = parseFloat(e.target.value);
-    refreshGearAssembly();
-  });
-
-  setscrewDistInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.setscrewDistance = parseFloat(e.target.value) || 6;
-    refreshGearAssembly();
-  });
-
-  helixAngleInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.helixAngle = parseFloat(e.target.value) || 15;
-    refreshGearAssembly();
-  });
-
-  bevelAngleInput.addEventListener('input', (e) => {
-    const g = getActiveGear();
-    g.bevelAngle = parseFloat(e.target.value) || 25;
+    getActiveGear().hubLength = parseFloat(e.target.value) || 0;
     refreshGearAssembly();
   });
 }
 
-function setupKinematicsEvents() {
-  const toggleGearTrainCheck = document.getElementById('toggleGearTrainCheck');
-  const driverRpmInput = document.getElementById('driverRPM');
-  const simToggleBtn = document.getElementById('simToggleBtn');
-  const simSpeedSlider = document.getElementById('simSpeedSlider');
-  const addGearBtn = document.getElementById('addGearBtn');
-  const trainActionBox = document.getElementById('trainActionBox');
+function bindRangeAndNumber(rangeId, numId, labelId, suffix, callback) {
+  const range = document.getElementById(rangeId);
+  const num = document.getElementById(numId);
+  const label = document.getElementById(labelId);
 
-  toggleGearTrainCheck.addEventListener('change', (e) => {
+  range.addEventListener('input', (e) => {
+    num.value = e.target.value;
+    if (label) label.textContent = e.target.value + suffix;
+    callback(e.target.value);
+  });
+
+  num.addEventListener('input', (e) => {
+    range.value = e.target.value;
+    if (label) label.textContent = e.target.value + suffix;
+    callback(e.target.value);
+  });
+}
+
+// 5. Kinematics & Gear Assembly
+function setupKinematics() {
+  const enableTrainCheck = document.getElementById('enableGearTrainCheck');
+  const trainControls = document.getElementById('gearTrainControls');
+  const driverRpmRange = document.getElementById('driverRpmRange');
+  const driverRpmInput = document.getElementById('driverRpmInput');
+  const driverRpmVal = document.getElementById('driverRpmVal');
+  const posXInput = document.getElementById('gearPosXInput');
+  const posYInput = document.getElementById('gearPosYInput');
+
+  enableTrainCheck.addEventListener('change', (e) => {
     isGearTrainEnabled = e.target.checked;
-    trainActionBox.style.display = isGearTrainEnabled ? 'block' : 'none';
+    trainControls.style.display = isGearTrainEnabled ? 'block' : 'none';
+    document.getElementById('gearSelectorGroup').style.display = isGearTrainEnabled ? 'block' : 'none';
+
+    if (!isGearTrainEnabled) {
+      viewer.removeGear('gear_2');
+      activeGearId = 'gear_1';
+    }
+    setupGearSelectorDropdown();
     refreshGearAssembly();
+  });
+
+  driverRpmRange.addEventListener('input', (e) => {
+    driverRpmInput.value = e.target.value;
+    driverRpmVal.textContent = e.target.value + ' RPM';
+    gears[0].rpm = parseFloat(e.target.value);
+    calculateKinematics();
   });
 
   driverRpmInput.addEventListener('input', (e) => {
-    const rpm = parseFloat(e.target.value) || 1000;
-    const list = getActiveGearList();
-    const driver = list.find(g => g.isDriver) || list[0];
-    driver.rpm = rpm;
+    driverRpmRange.value = e.target.value;
+    driverRpmVal.textContent = e.target.value + ' RPM';
+    gears[0].rpm = parseFloat(e.target.value);
+    calculateKinematics();
+  });
+
+  posXInput.addEventListener('input', (e) => {
+    getActiveGear().posX = parseFloat(e.target.value) || 0;
     refreshGearAssembly();
   });
 
-  simToggleBtn.addEventListener('click', () => {
-    viewer.isRunning = !viewer.isRunning;
-    if (viewer.isRunning) {
-      simToggleBtn.innerHTML = `<span>توقف چرخش</span>`;
-      simToggleBtn.className = 'btn btn-success';
-    } else {
-      simToggleBtn.innerHTML = `<span>شروع چرخش</span>`;
-      simToggleBtn.className = 'btn btn-primary';
-    }
+  posYInput.addEventListener('input', (e) => {
+    getActiveGear().posY = parseFloat(e.target.value) || 0;
+    refreshGearAssembly();
+  });
+}
+
+function calculateKinematics() {
+  if (!isGearTrainEnabled) return;
+
+  const g1 = gears[0];
+  const g2 = gears[1];
+
+  // Auto calculate center distance
+  const centerDist = ((g1.numTeeth + g2.numTeeth) * g1.module) / 2.0;
+  g2.posX = centerDist;
+  g2.posY = 0;
+
+  // Gear Ratio i = Z2 / Z1
+  const ratio = g2.numTeeth / g1.numTeeth;
+  g2.rpm = g1.rpm / ratio;
+  g2.initialDirection = -g1.initialDirection;
+
+  // Update speeds in viewer
+  const grp1 = viewer.getGearMeshGroup('gear_1');
+  const grp2 = viewer.getGearMeshGroup('gear_2');
+  if (grp1) grp1.userData.speed = g1.rpm * g1.initialDirection;
+  if (grp2) grp2.userData.speed = g2.rpm * g2.initialDirection;
+
+  // Render Table
+  const tbody = document.getElementById('kinematicsTableBody');
+  tbody.innerHTML = `
+    <tr>
+      <td>${g1.name} (محرک)</td>
+      <td>${g1.numTeeth}</td>
+      <td><strong style="color:#3b82f6;">${Math.round(g1.rpm)} RPM</strong></td>
+      <td>1.0</td>
+      <td>${g1.initialDirection > 0 ? 'پادساعتگرد' : 'ساعتگرد'}</td>
+    </tr>
+    <tr>
+      <td>${g2.name} (متحرک)</td>
+      <td>${g2.numTeeth}</td>
+      <td><strong style="color:#10b981;">${Math.round(g2.rpm)} RPM</strong></td>
+      <td>${ratio.toFixed(2)}</td>
+      <td>${g2.initialDirection > 0 ? 'پادساعتگرد' : 'ساعتگرد'}</td>
+    </tr>
+  `;
+}
+
+// 6. Materials
+function setupMaterialPicker() {
+  const matCards = document.querySelectorAll('.mat-card');
+  matCards.forEach(card => {
+    card.addEventListener('click', () => {
+      matCards.forEach(c => c.classList.remove('active'));
+      card.classList.add('active');
+      const matType = card.getAttribute('data-material');
+      viewer.setMaterialType(matType);
+    });
   });
 
-  simSpeedSlider.addEventListener('input', (e) => {
-    viewer.simSpeed = parseFloat(e.target.value) || 1.0;
+  const colorPicker = document.getElementById('gearColorPicker');
+  const colorHex = document.getElementById('gearColorHex');
+  colorPicker.addEventListener('input', (e) => {
+    colorHex.textContent = e.target.value;
+    getActiveGear().color = e.target.value;
+    refreshGearAssembly();
   });
+}
 
-  addGearBtn.addEventListener('click', () => {
-    const nextIdx = gears.length + 1;
-    const teethOptions = [18, 24, 30, 40, 50];
-    const chosenTeeth = teethOptions[nextIdx % teethOptions.length];
-    const colors = ['#ec4899', '#8b5cf6', '#f59e0b', '#06b6d4', '#10b981'];
+// 7. Exporters and Native File Sharing Sheet
+function setupExportersAndSharing() {
+  const bigShareBtn = document.getElementById('bigShareBtn');
+  const openShareModalBtn = document.getElementById('openShareModalBtn');
+  const shareModal = document.getElementById('shareModal');
+  const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+  const confirmShareBtn = document.getElementById('confirmShareBtn');
+  const modalGearSelect = document.getElementById('modalShareGearSelect');
 
-    // Automatically place next to previous gear
-    const lastGear = gears[gears.length - 1];
-    const prevRadius = (lastGear.module * lastGear.numTeeth) / 2.0;
-    const thisRadius = (lastGear.module * chosenTeeth) / 2.0;
-    const nextX = lastGear.posX + prevRadius + thisRadius;
-
-    const newId = `gear_${Date.now()}`;
-    gears.push({
-      id: newId,
-      name: `چرخ‌دنده ${nextIdx}`,
-      type: 'spur',
-      module: lastGear.module,
-      numTeeth: chosenTeeth,
-      pressureAngle: 20,
-      faceWidth: lastGear.faceWidth,
-      boreDiameter: 12,
-      hasHub: true,
-      hubDiameter: 26,
-      hubLength: 12,
-      hasSetscrew: false,
-      setscrewSize: 4,
-      setscrewDistance: 6,
-      color: colors[nextIdx % colors.length],
-      isDriver: false,
-      rpm: 0,
-      posX: Math.round(nextX),
-      posY: 0
+  function openShareDialog() {
+    modalGearSelect.innerHTML = '';
+    const list = getActiveGearList();
+    list.forEach(g => {
+      const opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = `${g.name} (مدول ${g.module}، ${g.numTeeth} دندانه)`;
+      if (g.id === activeGearId) opt.selected = true;
+      modalGearSelect.appendChild(opt);
     });
 
-    activeGearId = newId;
-    refreshGearAssembly();
-  });
-}
+    shareModal.classList.add('active');
+  }
 
-function setupViewportHudEvents() {
-  document.getElementById('viewIsoBtn').addEventListener('click', () => viewer.setPresetView('iso'));
-  document.getElementById('viewTopBtn').addEventListener('click', () => viewer.setPresetView('top'));
-  document.getElementById('viewFrontBtn').addEventListener('click', () => viewer.setPresetView('front'));
-  document.getElementById('viewSideBtn').addEventListener('click', () => viewer.setPresetView('side'));
-  document.getElementById('resetViewBtn').addEventListener('click', () => viewer.setPresetView('iso'));
+  bigShareBtn.addEventListener('click', openShareDialog);
+  openShareModalBtn.addEventListener('click', openShareDialog);
 
-  document.getElementById('materialSelect').addEventListener('change', (e) => {
-    viewer.setMaterialType(e.target.value);
+  closeShareModalBtn.addEventListener('click', () => {
+    shareModal.classList.remove('active');
   });
 
-  document.getElementById('toggleGridCheck').addEventListener('change', (e) => {
-    viewer.toggleGrid(e.target.checked);
-  });
-  document.getElementById('toggleAxesCheck').addEventListener('change', (e) => {
-    viewer.toggleAxes(e.target.checked);
-  });
-}
-
-function setupExportModalEvents() {
-  const modal = document.getElementById('exportModal');
-  const openExportBtn = document.getElementById('openExportBtn');
-  const openSendBtn = document.getElementById('openSendBtn');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-
-  openExportBtn.addEventListener('click', () => modal.classList.add('show'));
-  openSendBtn.addEventListener('click', () => modal.classList.add('show'));
-  closeModalBtn.addEventListener('click', () => modal.classList.remove('show'));
-
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.classList.remove('show');
+  shareModal.addEventListener('click', (e) => {
+    if (e.target === shareModal) shareModal.classList.remove('active');
   });
 
-  // Export 2D DXF
-  document.getElementById('exportDXFBtn').addEventListener('click', () => {
-    const gear = getActiveGear();
-    const profile = (gear.type === 'rack') ? GearMath.generateRackProfile(gear) : GearMath.generateSpurGearProfile(gear);
-    const dxfContent = GearExporters.exportToDXF(profile, gear);
-    const filename = `${gear.name || 'gear'}_m${gear.module}_z${gear.numTeeth}.dxf`;
-    GearExporters.downloadFile(dxfContent, filename, 'application/dxf');
+  // Format Radio styling inside modal
+  document.querySelectorAll('input[name="modalShareFormat"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      document.querySelectorAll('.format-radio').forEach(r => r.classList.remove('active'));
+      radio.closest('.format-radio').classList.add('active');
+    });
   });
 
-  // Export 3D Solid STEP (AP214)
-  document.getElementById('exportSTEPBtn').addEventListener('click', () => {
-    const gearMeshItem = viewer.gearMeshes.find(m => m.id === activeGearId) || viewer.gearMeshes[0];
-    if (!gearMeshItem) return;
-    const stepContent = GearExporters.exportToSTEP(gearMeshItem.group, gearMeshItem.gear);
-    const filename = `${gearMeshItem.gear.name || 'gear'}_m${gearMeshItem.gear.module}_z${gearMeshItem.gear.numTeeth}.stp`;
-    GearExporters.downloadFile(stepContent, filename, 'application/step');
-  });
+  // Execute Native Share
+  confirmShareBtn.addEventListener('click', async () => {
+    const selectedGearId = modalGearSelect.value;
+    const format = document.querySelector('input[name="modalShareFormat"]:checked').value;
+    const gear = gears.find(g => g.id === selectedGearId) || gears[0];
+    const group = viewer.getGearMeshGroup(gear.id);
 
-  // Export Binary STL
-  document.getElementById('exportSTLBtn').addEventListener('click', () => {
-    const gearMeshItem = viewer.gearMeshes.find(m => m.id === activeGearId) || viewer.gearMeshes[0];
-    if (!gearMeshItem) return;
-    const stlBlob = GearExporters.exportToSTL(gearMeshItem.group);
-    if (stlBlob) {
-      const filename = `${gearMeshItem.gear.name || 'gear'}_m${gearMeshItem.gear.module}_z${gearMeshItem.gear.numTeeth}.stl`;
-      GearExporters.downloadFile(stlBlob, filename, 'application/octet-stream');
+    let blob = null;
+    let filename = `GearForge_${gear.name.replace(/[\s\(\)]+/g, '_')}_Z${gear.numTeeth}_m${gear.module}`;
+    let mimeType = 'application/octet-stream';
+
+    if (format === 'stl') {
+      filename += '.stl';
+      mimeType = 'model/stl';
+      blob = GearExporters.exportToSTL(group);
+    } else if (format === 'step') {
+      filename += '.stp';
+      mimeType = 'application/step';
+      const stepText = GearExporters.exportToSTEP(group, gear);
+      blob = new Blob([stepText], { type: mimeType });
+    } else if (format === 'dxf') {
+      filename += '.dxf';
+      mimeType = 'application/dxf';
+      const gearData = GearMath.generateSpurGearProfile(gear);
+      const dxfText = GearExporters.exportToDXF(gearData, gear);
+      blob = new Blob([dxfText], { type: mimeType });
     }
+
+    shareModal.classList.remove('active');
+
+    await GearExporters.shareFileNative(
+      blob,
+      filename,
+      mimeType,
+      filename,
+      `خروجی مهندسی چرخ‌دنده ${gear.name} (Z=${gear.numTeeth}, m=${gear.module}) جهت ساخت، پرینت و CNC`
+    );
   });
 
-  // Direct Send / Native Share
-  document.getElementById('sendDirectBtn').addEventListener('click', async () => {
-    const gearMeshItem = viewer.gearMeshes.find(m => m.id === activeGearId) || viewer.gearMeshes[0];
-    if (!gearMeshItem) return;
-    const stlBlob = GearExporters.exportToSTL(gearMeshItem.group);
-    const filename = `${gearMeshItem.gear.name || 'gear'}.stl`;
-    const title = `مدل چرخ‌دنده مهندسی - ${gearMeshItem.gear.name}`;
-    const text = `فایل چرخ‌دنده سالید استاندارد مدول ${gearMeshItem.gear.module} و ${gearMeshItem.gear.numTeeth} دندانه`;
-    await GearExporters.shareFile(stlBlob, filename, title, text);
-    modal.classList.remove('show');
+  // Direct Download STL
+  document.getElementById('downloadStlBtn').addEventListener('click', () => {
+    const gear = getActiveGear();
+    const group = viewer.getGearMeshGroup(gear.id);
+    const blob = GearExporters.exportToSTL(group);
+    const filename = `Gear_${gear.numTeeth}T_m${gear.module}.stl`;
+    GearExporters.downloadFile(blob, filename, 'model/stl');
+  });
+
+  // Direct Download STEP
+  document.getElementById('downloadStepBtn').addEventListener('click', () => {
+    const gear = getActiveGear();
+    const group = viewer.getGearMeshGroup(gear.id);
+    const text = GearExporters.exportToSTEP(group, gear);
+    const blob = new Blob([text], { type: 'application/step' });
+    const filename = `Gear_${gear.numTeeth}T_m${gear.module}.stp`;
+    GearExporters.downloadFile(blob, filename, 'application/step');
+  });
+
+  // Direct Download DXF
+  document.getElementById('downloadDxfBtn').addEventListener('click', () => {
+    const gear = getActiveGear();
+    const gearData = GearMath.generateSpurGearProfile(gear);
+    const text = GearExporters.exportToDXF(gearData, gear);
+    const blob = new Blob([text], { type: 'application/dxf' });
+    const filename = `Gear_${gear.numTeeth}T_m${gear.module}.dxf`;
+    GearExporters.downloadFile(blob, filename, 'application/dxf');
+  });
+}
+
+// 8. In-App Update Checker (GitHub Actions CI/CD)
+function setupInAppUpdateChecker() {
+  const checkNavBtn = document.getElementById('checkUpdateNavBtn');
+  const checkActionBtn = document.getElementById('checkUpdateActionBtn');
+  const statusCard = document.getElementById('updateStatusCard');
+  const statusMsg = document.getElementById('updateStatusMsg');
+  const actionArea = document.getElementById('updateActionArea');
+
+  async function performUpdateCheck() {
+    statusCard.style.display = 'block';
+    statusMsg.innerHTML = '<span style="color:#3b82f6;">🔍 در حال بررسی آخرین نسخه APK روی سرورهای گیت‌هاب...</span>';
+    actionArea.innerHTML = '';
+
+    const repoOwner = 'abolfazl81079-glitch';
+    const repoName = 'gearforge-3d';
+
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/actions/runs?status=success&per_page=1`);
+      if (!res.ok) throw new Error('عدم دریافت پاسخ از سرور گیت‌هاب');
+
+      const data = await res.json();
+      if (data.workflow_runs && data.workflow_runs.length > 0) {
+        const latestRun = data.workflow_runs[0];
+        const date = new Date(latestRun.created_at).toLocaleDateString('fa-IR');
+        const commitMsg = latestRun.head_commit ? latestRun.head_commit.message : 'به‌روزرسانی عمومی';
+
+        statusMsg.innerHTML = `
+          <div style="font-weight:700; color:#10b981; margin-bottom:6px;">✅ آخرین بیلد آماده در گیت‌هاب یافت شد!</div>
+          <div style="font-size:11.5px; color:var(--current-text-muted); line-height:1.5;">
+            <strong>تاریخ انتشار:</strong> ${date}<br>
+            <strong>پیام تغییرات:</strong> ${commitMsg}
+          </div>
+        `;
+
+        actionArea.innerHTML = `
+          <a href="${latestRun.html_url}" target="_blank" class="btn btn-primary btn-large btn-full" style="margin-top:10px; text-decoration:none;">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            <span>دانلود و نصب فایل جدید APK از صفحه گیت‌هاب</span>
+          </a>
+        `;
+      } else {
+        statusMsg.innerHTML = '<span style="color:#10b981;">شما در حال استفاده از آخرین نسخه هستید.</span>';
+      }
+    } catch (err) {
+      statusMsg.innerHTML = `
+        <span style="color:#ef4444;">خطا در بررسی اینترنتی آپدیت. برای دانلود نسخه جدید می‌توانید مستقیماً به صفحه مخزن مراجعه کنید:</span>
+      `;
+      actionArea.innerHTML = `
+        <a href="https://github.com/${repoOwner}/${repoName}/actions" target="_blank" class="btn btn-primary btn-full" style="margin-top:8px; text-decoration:none;">
+          مشاهده بیلدها در گیت‌هاب
+        </a>
+      `;
+    }
+  }
+
+  checkActionBtn.addEventListener('click', performUpdateCheck);
+  checkNavBtn.addEventListener('click', () => {
+    // Switch to update tab
+    document.querySelector('.tab-btn[data-tab="tab-update"]').click();
+    performUpdateCheck();
+  });
+}
+
+// 9. Theme Toggle
+function setupThemeToggle() {
+  const btn = document.getElementById('themeToggleBtn');
+  btn.addEventListener('click', () => {
+    currentTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+  });
+}
+
+// 10. Refresh Gear Assembly & Viewport Floating Badge
+function refreshGearAssembly() {
+  const list = getActiveGearList();
+  let primaryGearData = null;
+
+  list.forEach(g => {
+    const gd = viewer.updateGearMesh(g);
+    if (g.id === 'gear_1') primaryGearData = gd;
+  });
+
+  if (isGearTrainEnabled) calculateKinematics();
+
+  // Update Floating CAD Specs Badge
+  if (primaryGearData) {
+    const g = gears[0];
+    document.getElementById('badgeModule').textContent = g.module;
+    document.getElementById('badgeTeeth').textContent = g.numTeeth;
+    document.getElementById('badgePitch').textContent = primaryGearData.pitchDiameter.toFixed(1) + ' mm';
+    document.getElementById('badgeOuter').textContent = primaryGearData.tipDiameter.toFixed(1) + ' mm';
+    document.getElementById('badgeWidth').textContent = g.faceWidth + ' mm';
+  }
+
+  viewer.resize();
+}
+
+function syncControlsFromGear(g) {
+  document.getElementById('moduleRange').value = g.module;
+  document.getElementById('moduleInput').value = g.module;
+  document.getElementById('moduleVal').textContent = g.module + ' mm';
+
+  document.getElementById('numTeethRange').value = g.numTeeth;
+  document.getElementById('numTeethInput').value = g.numTeeth;
+  document.getElementById('numTeethVal').textContent = g.numTeeth;
+
+  document.getElementById('faceWidthRange').value = g.faceWidth;
+  document.getElementById('faceWidthInput').value = g.faceWidth;
+  document.getElementById('faceWidthVal').textContent = g.faceWidth + ' mm';
+
+  document.getElementById('boreDiaRange').value = g.boreDiameter;
+  document.getElementById('boreDiaInput').value = g.boreDiameter;
+  document.getElementById('boreDiaVal').textContent = g.boreDiameter + ' mm';
+
+  document.getElementById('hasKeywayCheck').checked = !!g.hasKeyway;
+  document.getElementById('keywaySettings').style.display = g.hasKeyway ? 'block' : 'none';
+  document.getElementById('keywayWidthInput').value = g.keywayWidth || 4;
+  document.getElementById('keywayDepthInput').value = g.keywayDepth || 2.5;
+
+  document.getElementById('hasHubCheck').checked = !!g.hasHub;
+  document.getElementById('hubSettings').style.display = g.hasHub ? 'block' : 'none';
+  document.getElementById('hubDiaInput').value = g.hubDiameter || 26;
+  document.getElementById('hubLengthInput').value = g.hubLength || 12;
+
+  document.getElementById('gearPosXInput').value = g.posX || 0;
+  document.getElementById('gearPosYInput').value = g.posY || 0;
+
+  document.getElementById('gearColorPicker').value = g.color || '#3b82f6';
+  document.getElementById('gearColorHex').textContent = g.color || '#3b82f6';
+
+  // Update radio buttons
+  document.querySelectorAll('input[name="pressureAngle"]').forEach(radio => {
+    radio.checked = (parseFloat(radio.value) === g.pressureAngle);
+    radio.closest('.radio-label').classList.toggle('active', radio.checked);
+  });
+
+  document.querySelectorAll('input[name="gearType"]').forEach(radio => {
+    radio.checked = (radio.value === g.type);
+    radio.closest('.pill-option').classList.toggle('active', radio.checked);
   });
 }
