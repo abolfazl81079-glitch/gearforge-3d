@@ -1,0 +1,8 @@
+{
+  "appId": "com.gearforge3d.app",
+  "appName": "GearForge 3D",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}
