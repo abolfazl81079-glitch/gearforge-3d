@@ -1,55 +1,52 @@
-/* Precision CAD Styling (Evolvent Design Aesthetics) */
-/* Top 50% 3D Viewport / Bottom 50% Control Panel Split Layout */
+/* Precision Native CAD Mobile Interface (Swiss3D CAD Standard) */
+/* High Contrast Day/Night Mode, Native Steppers, Glassmorphic Headers & Touch CAD Deck */
 
 :root {
-  --primary: #3b82f6;
-  --primary-hover: #2563eb;
-  --secondary: #10b981;
+  --primary: #2563eb;
+  --primary-glow: rgba(37, 99, 235, 0.4);
   --accent: #f59e0b;
+  --success: #10b981;
   --danger: #ef4444;
-  
-  --bg-dark: #0a0f1d;
-  --card-dark: #121a2d;
-  --card-hover-dark: #1a253e;
-  --border-dark: #1f2c47;
-  --text-dark: #f8fafc;
-  --text-muted-dark: #94a3b8;
-  
-  --bg-light: #f8fafc;
-  --card-light: #ffffff;
-  --card-hover-light: #f1f5f9;
-  --border-light: #e2e8f0;
-  --text-light: #0f172a;
-  --text-muted-light: #64748b;
-  
-  --current-bg: var(--bg-dark);
-  --current-card: var(--card-dark);
-  --current-card-hover: var(--card-hover-dark);
-  --current-border: var(--border-dark);
-  --current-text: var(--text-dark);
-  --current-text-muted: var(--text-muted-dark);
+
+  /* Dark Theme (Default) */
+  --app-bg: #0a0e1a;
+  --app-card: #111827;
+  --app-card-elevated: #1f293d;
+  --app-border: #1f2c42;
+  --app-text: #f9fafb;
+  --app-text-muted: #94a3b8;
+  --stepper-btn-bg: #1e293b;
+  --stepper-btn-hover: #334155;
+  --cad-viewport-bg: radial-gradient(circle at 50% 40%, #151e33 0%, #0a0e1a 100%);
+  --sheet-backdrop: rgba(0, 0, 0, 0.75);
 }
 
 [data-theme="light"] {
-  --current-bg: var(--bg-light);
-  --current-card: var(--card-light);
-  --current-card-hover: var(--card-hover-light);
-  --current-border: var(--border-light);
-  --current-text: var(--text-light);
-  --current-text-muted: var(--text-muted-light);
+  /* Day Theme (Swiss Precision Studio Light) */
+  --app-bg: #f8fafc;
+  --app-card: #ffffff;
+  --app-card-elevated: #f1f5f9;
+  --app-border: #cbd5e1;
+  --app-text: #0f172a;
+  --app-text-muted: #64748b;
+  --stepper-btn-bg: #e2e8f0;
+  --stepper-btn-hover: #cbd5e1;
+  --cad-viewport-bg: radial-gradient(circle at 50% 40%, #ffffff 0%, #e2e8f0 100%);
+  --sheet-backdrop: rgba(15, 23, 42, 0.6);
 }
 
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: system-ui, -apple-system, 'Vazirmatn', Roboto, Tahoma, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Vazirmatn', Helvetica, Arial, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-body {
-  background-color: var(--current-bg);
-  color: var(--current-text);
+body.native-app-body {
+  background-color: var(--app-bg);
+  color: var(--app-text);
   overflow: hidden;
   height: 100vh;
   height: 100dvh;
@@ -57,109 +54,96 @@ body {
   flex-direction: column;
 }
 
-/* Slim Top Header */
-header {
+/* 1. Sleek App Header Bar */
+.app-header {
   height: 50px;
-  background-color: var(--current-card);
-  border-bottom: 1px solid var(--current-border);
+  background-color: var(--app-card);
+  border-bottom: 1px solid var(--app-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 12px;
-  z-index: 20;
+  z-index: 30;
   flex-shrink: 0;
 }
 
-.brand {
+.header-brand {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.brand-icon {
+.brand-logo-icon {
   width: 32px;
   height: 32px;
-  background: linear-gradient(135deg, #3b82f6, #06b6d4);
+  background: linear-gradient(135deg, #2563eb, #0284c7);
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.4);
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
-.brand-title {
-  font-size: 15px;
-  font-weight: 700;
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-name {
+  font-size: 14.5px;
+  font-weight: 800;
   letter-spacing: -0.3px;
+  line-height: 1.1;
 }
 
-.brand-subtitle {
-  font-size: 10px;
-  color: var(--current-text-muted);
+.app-tag {
+  font-size: 9.5px;
+  color: var(--app-text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
 }
 
-.nav-actions {
+.header-actions {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-/* General Buttons */
-.btn {
-  background-color: var(--current-card);
-  border: 1px solid var(--current-border);
-  color: var(--current-text);
-  padding: 6px 10px;
-  border-radius: 7px;
+.app-action-btn {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  padding: 6px 12px;
+  border-radius: 8px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s ease;
-  white-space: nowrap;
+  transition: all 0.15s ease;
 }
 
-.btn svg {
-  width: 14px;
-  height: 14px;
+.app-action-btn svg {
+  width: 15px;
+  height: 15px;
   fill: currentColor;
 }
 
-.btn:hover {
-  background-color: var(--current-card-hover);
-  border-color: var(--primary);
-}
-
-.btn-icon {
+.app-action-btn.icon-only {
   padding: 6px;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
+.app-action-btn.primary {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: white;
   border: none;
-  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+  box-shadow: 0 2px 8px var(--primary-glow);
 }
 
-.btn-primary:hover {
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-}
-
-.btn-large {
-  padding: 10px 16px;
-  font-size: 14px;
-}
-
-.btn-full {
-  width: 100%;
-  justify-content: center;
-}
-
-/* Split Screen Container */
-.app-split-container {
+/* 2. 50/50 Split Viewport Layout */
+.native-viewport-split {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -168,14 +152,14 @@ header {
   overflow: hidden;
 }
 
-/* TOP HALF: 3D Viewport */
-.viewport-section {
+/* TOP 50%: 3D CAD Viewport */
+.cad-viewport-container {
   height: 48%;
   min-height: 220px;
   width: 100%;
   position: relative;
-  background: radial-gradient(circle at 50% 40%, #151e33 0%, #0a0e1a 100%);
-  border-bottom: 2px solid var(--current-border);
+  background: var(--cad-viewport-bg);
+  border-bottom: 2px solid var(--app-border);
   flex-shrink: 0;
   overflow: hidden;
 }
@@ -188,27 +172,33 @@ header {
   touch-action: none;
 }
 
-/* Floating CAD Navigation Toolbar */
-.cad-view-toolbar {
+/* Floating CAD View Navigation Bar */
+.floating-cad-nav {
   position: absolute;
   top: 10px;
   inset-inline-end: 10px;
   display: flex;
   align-items: center;
   gap: 4px;
-  background: rgba(18, 26, 45, 0.88);
+  background: rgba(17, 24, 39, 0.88);
   backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 9px;
   padding: 4px 6px;
   z-index: 10;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
 }
 
-.cad-tool-btn {
+[data-theme="light"] .floating-cad-nav {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+
+.nav-icon-btn {
   background: transparent;
   border: none;
-  color: var(--text-muted-dark);
+  color: var(--app-text-muted);
   padding: 5px 7px;
   border-radius: 6px;
   font-size: 11px;
@@ -220,96 +210,101 @@ header {
   transition: all 0.15s;
 }
 
-.cad-tool-btn svg {
+.nav-icon-btn svg {
   width: 14px;
   height: 14px;
   fill: currentColor;
 }
 
-.cad-tool-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
+.nav-icon-btn:hover {
+  background: rgba(125, 125, 125, 0.15);
+  color: var(--app-text);
 }
 
-.cad-tool-btn.active {
-  background: rgba(59, 130, 246, 0.3);
-  color: #60a5fa;
-  border: 1px solid rgba(59, 130, 246, 0.5);
+.nav-icon-btn.active {
+  background: rgba(37, 99, 235, 0.25);
+  color: #3b82f6;
+  border: 1px solid rgba(37, 99, 235, 0.4);
 }
 
-.cad-toolbar-divider {
+.nav-sep {
   width: 1px;
   height: 16px;
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(125, 125, 125, 0.25);
   margin: 0 2px;
 }
 
-/* Floating CAD Spec Badge */
-.cad-spec-badge {
+/* Engineering HUD Overlay */
+.cad-hud-overlay {
   position: absolute;
   bottom: 8px;
   inset-inline-start: 10px;
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  background: rgba(14, 20, 36, 0.85);
+  background: rgba(17, 24, 39, 0.85);
   backdrop-filter: blur(6px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 7px;
+  border-radius: 8px;
   padding: 4px 8px;
   z-index: 10;
   font-family: monospace;
   font-size: 11px;
 }
 
-.spec-item {
+[data-theme="light"] .cad-hud-overlay {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+.hud-chip {
   display: flex;
   gap: 3px;
 }
 
-.spec-label {
-  color: #38bdf8;
-  font-weight: 700;
+.chip-k {
+  color: #0284c7;
+  font-weight: 800;
 }
 
-.spec-val {
-  color: #f1f5f9;
+.chip-v {
+  color: var(--app-text);
 }
 
-/* BOTTOM HALF: Controls Panel */
-.controls-section {
+/* BOTTOM 50%: Native CAD Control Deck */
+.cad-deck-container {
   height: 52%;
   width: 100%;
   display: flex;
   flex-direction: column;
-  background-color: var(--current-card);
+  background-color: var(--app-card);
   overflow: hidden;
 }
 
-/* Tabs Header */
-.tabs-header {
+/* Segmented Tab Bar */
+.cad-tab-bar {
   display: flex;
   overflow-x: auto;
   scrollbar-width: none;
-  background-color: rgba(0, 0, 0, 0.2);
-  border-bottom: 1px solid var(--current-border);
+  background-color: var(--app-card-elevated);
+  border-bottom: 1px solid var(--app-border);
   flex-shrink: 0;
 }
 
-.tabs-header::-webkit-scrollbar {
+.cad-tab-bar::-webkit-scrollbar {
   display: none;
 }
 
-.tab-btn {
+.cad-tab-item {
   flex: 1;
-  min-width: 65px;
+  min-width: 62px;
   padding: 8px 4px;
   text-align: center;
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   background: transparent;
   border: none;
-  color: var(--current-text-muted);
+  color: var(--app-text-muted);
   cursor: pointer;
   transition: all 0.2s;
   border-bottom: 2px solid transparent;
@@ -320,477 +315,487 @@ header {
   white-space: nowrap;
 }
 
-.tab-btn svg {
+.cad-tab-item svg {
   width: 15px;
   height: 15px;
   fill: currentColor;
 }
 
-.tab-btn.active {
+.cad-tab-item.active {
   color: var(--primary);
   border-bottom-color: var(--primary);
-  background-color: rgba(59, 130, 246, 0.08);
+  background-color: rgba(37, 99, 235, 0.08);
 }
 
-/* Tab Content Areas */
-.tab-content {
+/* Tab Panel Content */
+.cad-panel-content {
   flex: 1;
   overflow-y: auto;
-  padding: 12px 14px;
+  padding: 10px 12px;
   display: none;
 }
 
-.tab-content.active {
+.cad-panel-content.active {
   display: block;
 }
 
-/* Form Groups & Controls */
-.form-group {
-  margin-bottom: 11px;
-}
-
-.form-label {
+/* 3. Native Stepper Card (NO SLIDERS) */
+.cad-stepper-card {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
+  border-radius: 9px;
+  padding: 8px 10px;
+  margin-bottom: 8px;
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
+}
+
+.stepper-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper-title {
   font-size: 12px;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.val-display {
-  color: var(--primary);
-  font-family: monospace;
   font-weight: 700;
+  color: var(--app-text);
 }
 
-.sub-label {
-  display: block;
-  font-size: 11px;
-  color: var(--current-text-muted);
-  margin-bottom: 4px;
+.stepper-badge {
+  font-size: 10px;
+  color: var(--app-text-muted);
+  font-family: monospace;
 }
 
-.form-select, .form-input {
-  width: 100%;
-  background-color: var(--current-bg);
-  border: 1px solid var(--current-border);
-  color: var(--current-text);
-  padding: 7px 10px;
-  border-radius: 6px;
-  font-size: 13px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-select:focus, .form-input:focus {
-  border-color: var(--primary);
-}
-
-.range-row {
+.stepper-controls {
   display: flex;
   align-items: center;
-  gap: 10px;
-}
-
-.form-range {
-  flex: 1;
-  height: 6px;
-  accent-color: var(--primary);
-  cursor: pointer;
-}
-
-.num-input {
-  width: 70px;
-  text-align: center;
-}
-
-.form-row-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-/* Pill Selectors (Gear Types) */
-.type-pill-selector {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
-}
-
-.pill-option {
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
-  padding: 7px 2px;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pill-option input {
-  display: none;
-}
-
-.pill-option.active {
-  background-color: rgba(59, 130, 246, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* Radio Button Group (Pressure Angle) */
-.radio-button-group {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.radio-label {
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
-  padding: 7px 4px;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.radio-label input {
-  display: none;
-}
-
-.radio-label.active {
-  background-color: rgba(59, 130, 246, 0.2);
-  border-color: var(--primary);
-  color: var(--primary);
-}
-
-/* Card Box (for grouped options like Keyway and Hub) */
-.card-box {
-  background-color: rgba(0, 0, 0, 0.15);
-  border: 1px solid var(--current-border);
+  gap: 4px;
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
+  padding: 2px;
+}
+
+.step-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--stepper-btn-bg);
+  border: none;
+  border-radius: 6px;
+  color: var(--app-text);
+  font-size: 16px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.step-btn:hover {
+  background: var(--stepper-btn-hover);
+}
+
+.step-btn:active {
+  transform: scale(0.92);
+}
+
+.step-input {
+  width: 58px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  color: var(--primary);
+  font-size: 14.5px;
+  font-weight: 800;
+  text-align: center;
+  font-family: monospace;
+  outline: none;
+  user-select: text;
+}
+
+/* 4. Native Segmented Group (Pills) */
+.native-segmented-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+  gap: 4px;
+  background: var(--app-bg);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--app-border);
+  margin-bottom: 10px;
+}
+
+.seg-btn {
+  padding: 8px 2px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  color: var(--app-text-muted);
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.seg-btn input {
+  display: none;
+}
+
+.seg-btn.active {
+  background: var(--app-card-elevated);
+  color: var(--primary);
+  border: 1px solid var(--app-border);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+}
+
+/* 5. Native Card Section */
+.native-card-section {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
   padding: 10px 12px;
   margin-bottom: 10px;
 }
 
-.checkbox-label {
+.native-switch-row {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 12px;
+  justify-content: space-between;
+  font-size: 12.5px;
   font-weight: 700;
   cursor: pointer;
 }
 
-.checkbox-label input {
-  width: 16px;
-  height: 16px;
+.native-switch {
+  width: 18px;
+  height: 18px;
   accent-color: var(--primary);
 }
 
-/* Material Grid */
-.material-grid {
+/* 6. Material Grid */
+.native-mat-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 6px;
 }
 
-.mat-card {
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
+.native-mat-pill {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
   border-radius: 8px;
-  padding: 8px 4px;
-  color: var(--current-text);
-  font-size: 11px;
-  font-weight: 600;
+  padding: 8px 6px;
+  color: var(--app-text);
+  font-size: 11.5px;
+  font-weight: 700;
   cursor: pointer;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 6px;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
-.mat-card.active {
+.native-mat-pill.active {
   border-color: var(--primary);
-  background-color: rgba(59, 130, 246, 0.15);
+  background: rgba(37, 99, 235, 0.15);
+  color: var(--primary);
 }
 
-.mat-preview {
-  width: 24px;
-  height: 24px;
+.mat-dot {
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
 }
 
-.mat-steel { background: linear-gradient(135deg, #64748b, #334155); }
-.mat-brass { background: linear-gradient(135deg, #f59e0b, #b45309); }
-.mat-aluminum { background: linear-gradient(135deg, #f1f5f9, #94a3b8); }
-.mat-plastic { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
-.mat-wire { background: transparent; border: 2px dashed #38bdf8; }
-
-.color-picker-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.color-input {
-  width: 40px;
-  height: 32px;
+.native-color-picker {
+  width: 36px;
+  height: 28px;
   border: none;
   background: transparent;
   cursor: pointer;
 }
 
-/* Export Cards */
-.divider-text {
-  text-align: center;
-  font-size: 11px;
-  color: var(--current-text-muted);
-  margin: 12px 0 8px 0;
-  position: relative;
-}
-
-.export-cards-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.export-card {
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
-  border-radius: 8px;
-  padding: 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.export-header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.export-badge {
-  background: rgba(59, 130, 246, 0.2);
-  color: #60a5fa;
-  font-size: 10px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-}
-
-.export-card h4 {
-  font-size: 13px;
-  font-weight: 700;
-}
-
-.export-card p {
-  font-size: 11px;
-  color: var(--current-text-muted);
-  line-height: 1.4;
-}
-
-.btn-export {
-  align-self: flex-start;
-  margin-top: 4px;
-}
-
-/* In-App Update Box */
-.update-box {
-  text-align: center;
-  padding: 16px 10px;
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
+/* 7. Native Export UI */
+.native-btn-hero {
+  width: 100%;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: white;
+  border: none;
   border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px var(--primary-glow);
+  transition: transform 0.15s;
+}
+
+.native-btn-hero:active {
+  transform: scale(0.98);
+}
+
+.native-btn-hero svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+.native-section-divider {
+  text-align: center;
+  font-size: 11px;
+  color: var(--app-text-muted);
+  margin: 12px 0 8px 0;
+  font-weight: 600;
+}
+
+.native-export-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.native-export-item {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
+  border-radius: 9px;
+  padding: 8px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.export-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.export-tag {
+  font-size: 10px;
+  font-weight: 800;
+  padding: 3px 6px;
+  border-radius: 5px;
+  color: white;
+}
+
+.tag-stl { background: #2563eb; }
+.tag-step { background: #059669; }
+.tag-dxf { background: #d97706; }
+
+.export-details strong {
+  display: block;
+  font-size: 12px;
+}
+
+.export-details small {
+  display: block;
+  font-size: 10px;
+  color: var(--app-text-muted);
+  line-height: 1.3;
+}
+
+.native-sub-btn {
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
+  color: var(--app-text);
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.native-sub-btn svg {
+  width: 13px;
+  height: 13px;
+  fill: currentColor;
+}
+
+/* 8. Update Center Card */
+.update-center-card {
+  text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
 }
 
-.update-icon {
-  width: 44px;
-  height: 44px;
-  background: rgba(59, 130, 246, 0.2);
+.update-pulse-icon {
+  width: 48px;
+  height: 48px;
+  background: rgba(37, 99, 235, 0.15);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--primary);
+  margin-bottom: 4px;
 }
 
-.update-icon svg {
-  width: 24px;
-  height: 24px;
+.update-pulse-icon svg {
+  width: 26px;
+  height: 26px;
   fill: currentColor;
 }
 
-.update-box h3 {
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.update-box p {
-  font-size: 12px;
-  color: var(--current-text-muted);
-  max-width: 380px;
-}
-
-.update-status-card {
+.update-result-card {
   width: 100%;
   margin-top: 10px;
-  padding: 12px;
+  padding: 10px 12px;
   border-radius: 8px;
-  background: var(--current-card);
-  border: 1px solid var(--current-border);
+  background: var(--app-bg);
+  border: 1px solid var(--app-border);
   text-align: start;
 }
 
-/* Kinematics Table */
-.kinematics-table-card {
-  border: 1px solid var(--current-border);
-  border-radius: 7px;
-  overflow: hidden;
-  margin-top: 8px;
-}
-
-.cad-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
-  text-align: center;
-}
-
-.cad-table th {
-  background: rgba(0, 0, 0, 0.25);
-  padding: 6px;
-  color: var(--current-text-muted);
-}
-
-.cad-table td {
-  padding: 6px;
-  border-top: 1px solid var(--current-border);
-}
-
-/* Modal Dialog */
-.modal-backdrop {
+/* 9. Native Bottom Sheet Modal */
+.native-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: var(--sheet-backdrop);
   backdrop-filter: blur(4px);
   display: none;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 100;
-  padding: 14px;
 }
 
-.modal-backdrop.active {
+.native-modal-backdrop.active {
   display: flex;
 }
 
-.modal-card {
-  background: var(--current-card);
-  border: 1px solid var(--current-border);
-  border-radius: 12px;
+.native-modal-sheet {
+  background: var(--app-card);
+  border-top: 1px solid var(--app-border);
+  border-radius: 16px 16px 0 0;
   width: 100%;
-  max-width: 440px;
-  overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-  animation: modalIn 0.25s ease-out;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+  animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes modalIn {
-  from { opacity: 0; transform: translateY(20px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }
 
-.modal-header {
+.modal-sheet-header {
   padding: 12px 16px;
-  border-bottom: 1px solid var(--current-border);
+  border-bottom: 1px solid var(--app-border);
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.modal-title-row {
+.sheet-title-row {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.modal-title-row h3 {
-  font-size: 14px;
-  font-weight: 700;
+.sheet-title-row h3 {
+  font-size: 13.5px;
+  font-weight: 800;
 }
 
-.modal-close {
+.sheet-close-btn {
   background: transparent;
   border: none;
   font-size: 22px;
-  color: var(--current-text-muted);
+  color: var(--app-text-muted);
   cursor: pointer;
-  padding: 0 4px;
+  line-height: 1;
 }
 
-.modal-body {
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.modal-sheet-body {
+  padding: 12px 16px 20px 16px;
 }
 
-.format-choice-list {
+.native-format-stack {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.format-radio {
-  background: var(--current-bg);
-  border: 1px solid var(--current-border);
-  border-radius: 8px;
+.native-format-row {
+  background: var(--app-card-elevated);
+  border: 1px solid var(--app-border);
+  border-radius: 9px;
   padding: 10px 12px;
   cursor: pointer;
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  transition: all 0.2s;
+  transition: all 0.15s;
 }
 
-.format-radio.active {
+.native-format-row.active {
   border-color: var(--primary);
-  background-color: rgba(59, 130, 246, 0.12);
+  background: rgba(37, 99, 235, 0.12);
 }
 
-.format-radio input {
+.native-format-row input {
   margin-top: 3px;
   accent-color: var(--primary);
 }
 
-.format-info strong {
+.format-text strong {
   display: block;
   font-size: 12px;
-  margin-bottom: 2px;
 }
 
-.format-info small {
+.format-text small {
   display: block;
-  font-size: 10.5px;
-  color: var(--current-text-muted);
+  font-size: 10px;
+  color: var(--app-text-muted);
+}
+
+/* 10. In-App Toast Container */
+.cad-toast-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.cad-toast {
+  background: rgba(17, 24, 39, 0.95);
+  color: white;
+  border: 1px solid var(--app-border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  animation: toastIn 0.25s ease-out;
+}
+
+[data-theme="light"] .cad-toast {
+  background: rgba(15, 23, 42, 0.95);
+  color: white;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
 }

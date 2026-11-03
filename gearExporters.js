@@ -1,16 +1,16 @@
-// Standard CAD Exporters (Watertight Binary STL, AutoCAD DXF, ISO 10303-21 STEP)
-// Native Android Web Share API Integration for Instant App Sharing (WhatsApp, Telegram, Gmail, etc.)
+// Standard CAD Exporters (Precision Binary STL, AutoCAD DXF, ISO 10303-21 STEP)
+// Native File Sharing Engine for Android & Mobile (WhatsApp, Telegram, Gmail, Files)
 
 const GearExporters = {
 
-  // 1. 100% Watertight Binary STL Exporter (Guaranteed for Cura, PrusaSlicer, SolidWorks)
+  // 1. 100% Watertight Binary STL Exporter (Zero Non-Manifold Errors)
   exportToSTL: function(meshOrGroup) {
     if (!meshOrGroup) return null;
 
     const geometries = [];
     meshOrGroup.traverse(child => {
-      // Only export solid meshes (ignore line segments or edge helpers)
-      if (child.isMesh && child.geometry && !child.isLineSegments) {
+      // Only export solid meshes (ignore line segments, edge helpers, markers)
+      if (child.isMesh && child.geometry && !child.isLineSegments && child.geometry.attributes.position) {
         const geom = child.geometry.clone();
         geom.applyMatrix4(child.matrixWorld || child.matrix);
         geometries.push(geom);
@@ -23,7 +23,7 @@ const GearExporters = {
     geometries.forEach(g => {
       if (g.index) {
         totalTriangles += g.index.count / 3;
-      } else if (g.attributes.position) {
+      } else {
         totalTriangles += g.attributes.position.count / 3;
       }
     });
@@ -33,7 +33,7 @@ const GearExporters = {
     const view = new DataView(arrayBuffer);
 
     // 80-byte header
-    const headerStr = "GearForge 3D - Precision Watertight Solid Involute Gear";
+    const headerStr = "GearForge 3D - Solid Swiss Precision Involute Gear";
     for (let i = 0; i < 80; i++) {
       view.setUint8(i, i < headerStr.length ? headerStr.charCodeAt(i) : 0);
     }
@@ -62,32 +62,32 @@ const GearExporters = {
         vB.set(pos.getX(i2), pos.getY(i2), pos.getZ(i2));
         vC.set(pos.getX(i3), pos.getY(i3), pos.getZ(i3));
 
-        // Correct outward right-hand normal: (B - A) x (C - A)
+        // Right-hand rule normal vector: (B - A) x (C - A)
         edge1.subVectors(vB, vA);
         edge2.subVectors(vC, vA);
         normal.crossVectors(edge1, edge2).normalize();
 
         // Write normal (float32 x 3)
-        view.setFloat32(offset, normal.x || 0, true); offset += 4;
-        view.setFloat32(offset, normal.y || 0, true); offset += 4;
-        view.setFloat32(offset, normal.z || 0, true); offset += 4;
+        view.setFloat32(offset, isNaN(normal.x) ? 0 : normal.x, true); offset += 4;
+        view.setFloat32(offset, isNaN(normal.y) ? 0 : normal.y, true); offset += 4;
+        view.setFloat32(offset, isNaN(normal.z) ? 0 : normal.z, true); offset += 4;
 
-        // Write Vertex 1
+        // Vertex 1
         view.setFloat32(offset, vA.x, true); offset += 4;
         view.setFloat32(offset, vA.y, true); offset += 4;
         view.setFloat32(offset, vA.z, true); offset += 4;
 
-        // Write Vertex 2
+        // Vertex 2
         view.setFloat32(offset, vB.x, true); offset += 4;
         view.setFloat32(offset, vB.y, true); offset += 4;
         view.setFloat32(offset, vB.z, true); offset += 4;
 
-        // Write Vertex 3
+        // Vertex 3
         view.setFloat32(offset, vC.x, true); offset += 4;
         view.setFloat32(offset, vC.y, true); offset += 4;
         view.setFloat32(offset, vC.z, true); offset += 4;
 
-        // Attribute byte count (uint16)
+        // Attribute byte count (uint16 = 0)
         view.setUint16(offset, 0, true); offset += 2;
       }
     });
@@ -95,18 +95,17 @@ const GearExporters = {
     return new Blob([arrayBuffer], { type: 'model/stl' });
   },
 
-  // 2. Strict AutoCAD DXF Exporter (Closed LWPOLYLINE, AutoCAD 2000 / R15 Compatible)
-  exportToDXF: function(gearData, gearParams = {}) {
+  // 2. AutoCAD DXF Exporter (Closed LWPOLYLINE, AutoCAD 2000 Compatible)
+  exportToDXF: function(gearData, gearParams = {}, rackData = null) {
     const pts = gearData.points || [];
     const boreRadius = gearData.boreRadius || 0;
     const pitchRadius = gearData.pitchRadius || 0;
     const hubRadius = (gearParams.hasHub && gearParams.hubDiameter) ? (parseFloat(gearParams.hubDiameter) / 2.0) : 0;
-    const hasKeyway = !!gearParams.hasKeyway && parseFloat(gearParams.keywayWidth) > 0;
 
     let dxf = "";
     dxf += "0\nSECTION\n2\nHEADER\n";
     dxf += "9\n$ACADVER\n1\nAC1015\n"; // AutoCAD 2000
-    dxf += "9\n$INSUNITS\n70\n4\n";   // Millimeters
+    dxf += "9\n$INSUNITS\n70\n4\n";   // mm
     dxf += "0\nENDSEC\n";
 
     dxf += "0\nSECTION\n2\nTABLES\n";
@@ -114,14 +113,17 @@ const GearExporters = {
     dxf += "0\nLAYER\n2\n0\n70\n0\n62\n7\n6\nCONTINUOUS\n";
     dxf += "0\nLAYER\n2\nGEAR_TEETH\n70\n0\n62\n3\n6\nCONTINUOUS\n";
     dxf += "0\nLAYER\n2\nBORE_SHAFT\n70\n0\n62\n1\n6\nCONTINUOUS\n";
-    dxf += "0\nLAYER\n2\nKEYWAY\n70\n0\n62\n2\n6\nCONTINUOUS\n";
+    dxf += "0\nLAYER\n2\nHUB_OUTLINE\n70\n0\n62\n5\n6\nCONTINUOUS\n";
     dxf += "0\nLAYER\n2\nPITCH_CIRCLE\n70\n0\n62\n4\n6\nDASHED\n";
+    if (rackData) {
+      dxf += "0\nLAYER\n2\nRACK_TEETH\n70\n0\n62\n2\n6\nCONTINUOUS\n";
+    }
     dxf += "0\nENDTAB\n";
     dxf += "0\nENDSEC\n";
 
     dxf += "0\nSECTION\n2\nENTITIES\n";
 
-    // 1. Gear Tooth Contour: Closed LWPOLYLINE
+    // Gear Tooth Contour: Closed LWPOLYLINE
     if (pts.length > 2) {
       dxf += "0\nLWPOLYLINE\n";
       dxf += "8\nGEAR_TEETH\n";
@@ -133,49 +135,42 @@ const GearExporters = {
       }
     }
 
-    // 2. Bore Hole (and Keyway)
+    // Center Round Bore
     if (boreRadius > 0) {
-      if (!hasKeyway) {
-        dxf += "0\nCIRCLE\n";
-        dxf += "8\nBORE_SHAFT\n";
-        dxf += "10\n0.0\n20\n0.0\n30\n0.0\n";
-        dxf += "40\n" + boreRadius.toFixed(4) + "\n";
-      } else {
-        // Draw keyway + bore as a closed polyline
-        const kwW = parseFloat(gearParams.keywayWidth);
-        const kwD = parseFloat(gearParams.keywayDepth);
-        const kwHalf = Math.min(kwW / 2.0, boreRadius * 0.9);
-        const kwTop = boreRadius + kwD;
-        const ang = Math.asin(kwHalf / boreRadius);
-        const startAng = (Math.PI / 2.0) + ang;
-        const endAng = (Math.PI / 2.0) - ang;
-
-        const borePts = [];
-        const segs = 32;
-        for (let i = 0; i <= segs; i++) {
-          const a = startAng + (2 * Math.PI - 2 * ang) * (i / segs);
-          borePts.push({ x: boreRadius * Math.cos(a), y: boreRadius * Math.sin(a) });
-        }
-        borePts.push({ x: boreRadius * Math.cos(endAng), y: kwTop });
-        borePts.push({ x: boreRadius * Math.cos(startAng), y: kwTop });
-
-        dxf += "0\nLWPOLYLINE\n";
-        dxf += "8\nKEYWAY\n";
-        dxf += "90\n" + borePts.length + "\n";
-        dxf += "70\n1\n";
-        for (let i = 0; i < borePts.length; i++) {
-          dxf += "10\n" + borePts[i].x.toFixed(4) + "\n";
-          dxf += "20\n" + borePts[i].y.toFixed(4) + "\n";
-        }
-      }
+      dxf += "0\nCIRCLE\n";
+      dxf += "8\nBORE_SHAFT\n";
+      dxf += "10\n0.0\n20\n0.0\n30\n0.0\n";
+      dxf += "40\n" + boreRadius.toFixed(4) + "\n";
     }
 
-    // 3. Pitch Circle (Reference Layer)
+    // Hub Circle Outline
+    if (hubRadius > boreRadius) {
+      dxf += "0\nCIRCLE\n";
+      dxf += "8\nHUB_OUTLINE\n";
+      dxf += "10\n0.0\n20\n0.0\n30\n0.0\n";
+      dxf += "40\n" + hubRadius.toFixed(4) + "\n";
+    }
+
+    // Pitch Circle (Reference)
     if (pitchRadius > 0) {
       dxf += "0\nCIRCLE\n";
       dxf += "8\nPITCH_CIRCLE\n";
       dxf += "10\n0.0\n20\n0.0\n30\n0.0\n";
       dxf += "40\n" + pitchRadius.toFixed(4) + "\n";
+    }
+
+    // Linear Rack (if exported together in Rack & Pinion)
+    if (rackData && rackData.points && rackData.points.length > 2) {
+      const rPts = rackData.points;
+      const yOffset = -(pitchRadius + 0.1);
+      dxf += "0\nLWPOLYLINE\n";
+      dxf += "8\nRACK_TEETH\n";
+      dxf += "90\n" + rPts.length + "\n";
+      dxf += "70\n1\n";
+      for (let i = 0; i < rPts.length; i++) {
+        dxf += "10\n" + rPts[i].x.toFixed(4) + "\n";
+        dxf += "20\n" + (rPts[i].y + yOffset).toFixed(4) + "\n";
+      }
     }
 
     dxf += "0\nENDSEC\n";
@@ -184,8 +179,7 @@ const GearExporters = {
     return dxf;
   },
 
-  // 3. Valid ISO 10303-21 STEP (AP214 Solid Model)
-  // Generates valid ADVANCED_BREP_SHAPE_REPRESENTATION with individual Cartesian face definitions
+  // 3. ISO 10303-21 STEP Solid Model Exporter
   exportToSTEP: function(meshOrGroup, gearParams = {}) {
     if (!meshOrGroup) return "";
 
@@ -211,14 +205,14 @@ const GearExporters = {
       }
     });
 
-    const name = (gearParams.name || 'GEAR_MODEL').replace(/[^a-zA-Z0-9_-]/g, '_');
-    const mod = gearParams.module || 2.5;
-    const zTeeth = gearParams.numTeeth || 20;
+    const name = (gearParams.name || 'SWISS_GEAR').replace(/[^a-zA-Z0-9_-]/g, '_');
+    const mod = gearParams.module || 2.0;
+    const zTeeth = gearParams.numTeeth || 34;
     const dateStr = new Date().toISOString().replace(/[-:T]/g, '').slice(0, 15);
 
     let id = 1;
     let s = "ISO-10303-21;\nHEADER;\n";
-    s += `FILE_DESCRIPTION(('GearForge 3D Solid Involute Gear Part (Module ${mod}, Teeth ${zTeeth})'),'2;1');\n`;
+    s += `FILE_DESCRIPTION(('GearForge 3D Precision Gear Model (m=${mod}, Z=${zTeeth})'),'2;1');\n`;
     s += `FILE_NAME('${name}.stp','${dateStr}',('GearForge Engineer'),('Mechanical CAD'),'GearForge 3D Solid Engine','SolidWorks/CATIA/FreeCAD Compatible','');\n`;
     s += "FILE_SCHEMA(('AUTOMOTIVE_DESIGN { 1 0 10303 214 1 1 1 1 }'));\n";
     s += "ENDSEC;\nDATA;\n";
@@ -226,17 +220,16 @@ const GearExporters = {
     s += `#1=APPLICATION_CONTEXT('core data for mechanical design');\n`;
     s += `#2=APPLICATION_PROTOCOL_DEFINITION('international standard','automotive_design',2000,#1);\n`;
     s += `#3=PRODUCT_CONTEXT('',#1,'mechanical');\n`;
-    s += `#4=PRODUCT('${name}','${name}','Precision Involute Gear',(#3));\n`;
+    s += `#4=PRODUCT('${name}','${name}','Standard Involute Gear',(#3));\n`;
     s += `#5=PRODUCT_DEFINITION_FORMATION('1.0','Initial Release',#4);\n`;
     s += `#6=PRODUCT_DEFINITION('design','',#5,#3);\n`;
     s += `#7=PRODUCT_DEFINITION_SHAPE('','',#6);\n`;
 
-    // Standard SI Millimeter Units
     s += "#10=(LENGTH_UNIT()NAMED_UNIT(*)SI_UNIT(.MILLI.,.METRE.));\n";
     s += "#11=(NAMED_UNIT(*)PLANE_ANGLE_UNIT()SI_UNIT($,.RADIAN.));\n";
     s += "#12=(NAMED_UNIT(*)SI_UNIT($,.STERADIAN.)SOLID_ANGLE_UNIT());\n";
     s += "#13=UNCERTAINTY_MEASURE_WITH_UNIT(LENGTH_MEASURE(1.E-05),#10,'distance_accuracy_value','confusion accuracy');\n";
-    s += "#14=(GEOMETRIC_REPRESENTATION_CONTEXT(3)GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#13))GLOBAL_UNIT_ASSIGNED_CONTEXT((#10,#11,#12))REPRESENTATION_CONTEXT('Context #1','3D Context with Units'));\n";
+    s += "#14=(GEOMETRIC_REPRESENTATION_CONTEXT(3)GLOBAL_UNCERTAINTY_ASSIGNED_CONTEXT((#13))GLOBAL_UNIT_ASSIGNED_CONTEXT((#10,#11,#12))REPRESENTATION_CONTEXT('Context #1','3D Units'));\n";
 
     s += "#15=CARTESIAN_POINT('',(0.,0.,0.));\n";
     s += "#16=DIRECTION('',(0.,0.,1.));\n";
@@ -265,7 +258,6 @@ const GearExporters = {
       const p2 = registerPt(tri[1]);
       const p3 = registerPt(tri[2]);
 
-      // Calculate face normal
       v1.set(tri[1].x - tri[0].x, tri[1].y - tri[0].y, tri[1].z - tri[0].z);
       v2.set(tri[2].x - tri[0].x, tri[2].y - tri[0].y, tri[2].z - tri[0].z);
       norm.crossVectors(v1, v2).normalize();
@@ -302,34 +294,37 @@ const GearExporters = {
     return s;
   },
 
-  // 4. Native Android Web Share API: Opens System Share Sheet (Telegram, WhatsApp, Gmail, Bluetooth)
-  shareFileNative: async function(blob, filename, mimeType, title, text) {
+  // 4. Native Android Web Share API + Instant Download Fallback
+  shareFileNative: async function(blob, filename, mimeType, title, text, onToast) {
     if (!blob) {
-      alert("خطا در ایجاد فایل برای ارسال.");
+      if (onToast) onToast("خطا در ایجاد فایل برای ارسال", "error");
       return;
     }
 
     const file = new File([blob], filename, { type: mimeType });
 
+    // Check if Web Share API with files is supported
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       try {
         await navigator.share({
           title: title || filename,
-          text: text || "فایل خروجی مهندسی چرخ‌دنده GearForge 3D",
+          text: text || "فایل خروجی چرخ‌دنده مهندسی GearForge 3D",
           files: [file]
         });
+        if (onToast) onToast("فایل با موفقیت ارسال شد.", "success");
         return true;
       } catch (err) {
         if (err.name !== 'AbortError') {
           console.warn("Share failed, falling back to download:", err);
           this.downloadFile(blob, filename, mimeType);
+          if (onToast) onToast(`فایل به صورت مستقیم دانلود شد: ${filename}`, "info");
         }
         return false;
       }
     } else {
-      // Fallback for browsers without Web Share Files support
+      // Direct Download Fallback
       this.downloadFile(blob, filename, mimeType);
-      alert(`امکان اشتراک مستقیم روی این مرورگر پشتیبانی نمی‌شود. فایل ${filename} به صورت مستقیم دانلود شد.`);
+      if (onToast) onToast(`فایل ${filename} ذخیره شد.`, "success");
       return true;
     }
   },

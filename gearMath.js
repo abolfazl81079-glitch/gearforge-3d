@@ -1,18 +1,18 @@
-// Precision Involute Gear Generation (ISO 53 / DIN 867)
-// Strictly Monotonic Counter-Clockwise (CCW) Jordan Curve
-// Guarantees 100% Watertight, Solid, Manifold 3D Extrusion with Zero Holes
+// Precision Gear Math Engine (ISO 53 / DIN 867 & Swiss3D Standard)
+// Strictly Monotonic Closed Jordan Curves with Backlash (j) & Zero Self-Intersections
 
 const GearMath = {
   inv: function(a) {
     return Math.tan(a) - a;
   },
 
-  // Generates 100% Watertight, Non-Self-Intersecting Closed Spur Gear Profile
+  // Generates 100% Watertight, Solid Involute Spur Gear Profile with Backlash (Spiel)
   generateSpurGearProfile: function(params) {
-    const z = Math.max(4, parseInt(params.numTeeth) || 20);
-    const m = Math.max(0.1, parseFloat(params.module) || 2.5);
+    const z = Math.max(4, parseInt(params.numTeeth) || 34);
+    const m = Math.max(0.1, parseFloat(params.module) || 2.0);
     const alphaDeg = parseFloat(params.pressureAngle) || 20.0;
     const alpha = (alphaDeg * Math.PI) / 180.0;
+    const backlash = Math.max(0, parseFloat(params.backlash) || 0.15); // j in mm
 
     const pitchRadius = (m * z) / 2.0;
     const baseRadius = pitchRadius * Math.cos(alpha);
@@ -22,7 +22,9 @@ const GearMath = {
     const rootRadius = Math.max(0.5 * m, pitchRadius - dedendum);
 
     const pitchAngle = (2.0 * Math.PI) / z;
-    const halfTooth = Math.PI / (2.0 * z);
+    // Tooth thickness angle at pitch circle with backlash thinning: s = (pi*m/2 - j)
+    const arcToothThickness = Math.max(0.1 * m, (Math.PI * m / 2.0) - backlash);
+    const halfTooth = arcToothThickness / (2.0 * pitchRadius);
     const invAlpha = this.inv(alpha);
 
     const rootUnderBase = (rootRadius < baseRadius);
@@ -35,7 +37,7 @@ const GearMath = {
     for (let t = 0; t < z; t++) {
       const rot = t * pitchAngle;
 
-      // 1. Radial line from root to base circle (if root circle is below base circle)
+      // 1. Radial line from root to base circle (if undercut)
       if (rootUnderBase) {
         const ang = rot - rbAngle;
         points.push({
@@ -44,7 +46,7 @@ const GearMath = {
         });
       }
 
-      // 2. Flank 1: Involute from base/root to tip (outward)
+      // 2. Flank 1: Involute from base/root to tip (outward CCW)
       for (let i = 0; i <= samples; i++) {
         const r = rStart + (tipRadius - rStart) * (i / samples);
         const a = Math.acos(Math.min(1.0, baseRadius / r));
@@ -69,7 +71,7 @@ const GearMath = {
         });
       }
 
-      // 4. Flank 2: Involute from tip to base/root (inward)
+      // 4. Flank 2: Involute from tip to base/root (inward CCW)
       for (let i = samples; i >= 0; i--) {
         const r = rStart + (tipRadius - rStart) * (i / samples);
         const a = Math.acos(Math.min(1.0, baseRadius / r));
@@ -119,42 +121,46 @@ const GearMath = {
       numTeeth: z,
       pressureAngleDeg: alphaDeg,
       circularPitch: Math.PI * m,
-      boreRadius: params.boreDiameter ? parseFloat(params.boreDiameter) / 2.0 : 0,
-      hasKeyway: !!params.hasKeyway,
-      keywayWidth: parseFloat(params.keywayWidth) || 0,
-      keywayDepth: parseFloat(params.keywayDepth) || 0
+      backlash: backlash,
+      boreRadius: params.boreDiameter ? parseFloat(params.boreDiameter) / 2.0 : 4.0
     };
   },
 
-  // Generates Industrial Rack Profile (Linear Gear)
+  // Generates Precision Linear Rack Profile for Rack & Pinion
   generateRackProfile: function(params) {
-    const z = Math.max(4, parseInt(params.numTeeth) || 16);
-    const m = Math.max(0.1, parseFloat(params.module) || 2.5);
+    const z = Math.max(4, parseInt(params.rackTeeth) || 20);
+    const m = Math.max(0.1, parseFloat(params.module) || 2.0);
     const alphaDeg = parseFloat(params.pressureAngle) || 20.0;
     const alpha = (alphaDeg * Math.PI) / 180.0;
+    const backlash = Math.max(0, parseFloat(params.backlash) || 0.15);
 
     const p = Math.PI * m; // Pitch length
     const ha = 1.0 * m;   // Addendum
     const hf = 1.25 * m;  // Dedendum
     const totalLength = z * p;
     const startX = -totalLength / 2.0;
-    const backHeight = 3.0 * m;
+    const backHeight = 3.5 * m;
 
     const points = [];
 
-    // Bottom flat base
+    // Bottom solid flat base
     points.push({ x: startX, y: -hf - backHeight });
     points.push({ x: startX + totalLength, y: -hf - backHeight });
     points.push({ x: startX + totalLength, y: -hf });
 
-    // Teeth profile from right to left
+    // Teeth profile from right to left (CCW)
     const tanA = Math.tan(alpha);
+    const toothHalfThick = (p / 4.0) - (backlash / 2.0);
+    const toothPitchCenter = p / 2.0;
+
     for (let i = z - 1; i >= 0; i--) {
       const tx = startX + i * p;
-      const xRightRoot = tx + p * 0.75 + hf * tanA;
-      const xRightTip  = tx + p * 0.75 - ha * tanA;
-      const xLeftTip   = tx + p * 0.25 + ha * tanA;
-      const xLeftRoot  = tx + p * 0.25 - hf * tanA;
+      const xMid = tx + toothPitchCenter;
+
+      const xRightRoot = xMid + toothHalfThick + hf * tanA;
+      const xRightTip  = xMid + toothHalfThick - ha * tanA;
+      const xLeftTip   = xMid - toothHalfThick + ha * tanA;
+      const xLeftRoot  = xMid - toothHalfThick - hf * tanA;
 
       points.push({ x: xRightRoot, y: -hf });
       points.push({ x: xRightTip,  y: ha });
@@ -174,41 +180,9 @@ const GearMath = {
       numTeeth: z,
       pressureAngleDeg: alphaDeg,
       circularPitch: p,
-      boreRadius: 0
+      boreRadius: 0,
+      totalLength: totalLength,
+      height: ha + hf + backHeight
     };
-  },
-
-  // Builds Bore Hole with optional standard DIN 6885 / ANSI B17.1 Keyway
-  createBoreShapePath: function(boreRadius, hasKeyway, keywayWidth, keywayDepth) {
-    const path = new THREE.Path();
-    if (!boreRadius || boreRadius <= 0) return path;
-
-    if (!hasKeyway || !keywayWidth || keywayWidth <= 0 || !keywayDepth || keywayDepth <= 0) {
-      path.absarc(0, 0, boreRadius, 0, Math.PI * 2, true);
-      return path;
-    }
-
-    // Keyway slot oriented at top (+Y)
-    const kwHalf = Math.min(keywayWidth / 2.0, boreRadius * 0.9);
-    const kwTop = boreRadius + keywayDepth;
-    const ang = Math.asin(kwHalf / boreRadius);
-
-    const startAng = (Math.PI / 2.0) + ang;
-    const endAng = (Math.PI / 2.0) - ang;
-
-    // Draw clockwise circular arc from startAng around to endAng
-    path.absarc(0, 0, boreRadius, startAng, endAng, true);
-
-    // Keyway slot notch
-    const xRight = boreRadius * Math.cos(endAng);
-    const yRight = boreRadius * Math.sin(endAng);
-    const xLeft = boreRadius * Math.cos(startAng);
-    const yLeft = boreRadius * Math.sin(startAng);
-
-    path.lineTo(xRight, kwTop);
-    path.lineTo(xLeft, kwTop);
-    path.lineTo(xLeft, yLeft);
-
-    return path;
   }
 };

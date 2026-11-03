@@ -2,478 +2,478 @@
 <html lang="fa" dir="rtl" data-theme="dark">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#0e1424">
-  <title>GearForge 3D | طراحی، شبیه‌سازی و خروجی مهندسی چرخ‌دنده</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>GearForge 3D | نرم‌افزار مهندسی چرخ‌دنده (Swiss3D Standard)</title>
   
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="native-app-body">
 
-  <!-- Top Slim Header -->
-  <header>
-    <div class="brand">
-      <div class="brand-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+  <!-- Native App Header Bar -->
+  <header class="app-header">
+    <div class="header-brand">
+      <div class="brand-logo-icon">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
           <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.92c.04-.32.07-.65.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 13.5 2h-3c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.31.61.22l2.49-1c.52.39 1.06.73 1.69.98l.37 2.65c.04.24.25.42.5.42h3c.25 0 .46-.18.5-.42l.37-2.65c.63-.25 1.17-.59 1.69-.98l2.49 1c.22.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65Z"/>
         </svg>
       </div>
-      <div>
-        <div class="brand-title">GearForge 3D</div>
-        <div class="brand-subtitle">نرم‌افزار مهندسی چرخ‌دنده (Evolvent CAD)</div>
+      <div class="brand-text">
+        <h1 class="app-name">GearForge 3D</h1>
+        <span class="app-tag">Swiss CAD Precision</span>
       </div>
     </div>
 
-    <div class="nav-actions">
-      <!-- Quick Share Button -->
-      <button class="btn btn-primary" id="openShareModalBtn" title="ارسال فایل">
+    <div class="header-actions">
+      <!-- Quick Share Native Button -->
+      <button class="app-action-btn primary" id="openShareModalBtn" title="ارسال فایل">
         <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-        <span>ارسال فایل</span>
+        <span>ارسال</span>
       </button>
 
-      <!-- Check Update Button -->
-      <button class="btn" id="checkUpdateNavBtn" title="بررسی آپدیت">
-        <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-        <span>آپدیت</span>
-      </button>
-
-      <!-- Theme Switch -->
-      <button class="btn btn-icon" id="themeToggleBtn" title="تغییر تم">
-        <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
+      <!-- Theme Switch (Day/Night Mode) -->
+      <button class="app-action-btn icon-only" id="themeToggleBtn" title="تغییر تم روز / شب">
+        <svg viewBox="0 0 24 24" id="themeIcon"><path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
       </button>
     </div>
   </header>
 
-  <!-- Split Screen Container (Top: 3D Viewport, Bottom: Controls) -->
-  <main class="app-split-container">
+  <!-- 50/50 Split View Layout -->
+  <main class="native-viewport-split">
 
-    <!-- TOP HALF: 3D CAD Viewport (Evolvent Design Aesthetic) -->
-    <section class="viewport-section" id="viewportSection">
+    <!-- TOP 50%: 3D CAD Studio Viewport -->
+    <section class="cad-viewport-container" id="viewportContainer">
       <canvas id="canvas3d"></canvas>
 
-      <!-- Top-Right Floating CAD Navigation Toolbar -->
-      <div class="cad-view-toolbar">
-        <!-- Isometric 3D View -->
-        <button class="cad-tool-btn active" id="viewIsoBtn" title="نمای ایزومتریک ۳بعدی">
+      <!-- Floating CAD View Navigation (Pure Geometric Icons) -->
+      <div class="floating-cad-nav">
+        <button class="nav-icon-btn active" id="viewIsoBtn" title="نمای ایزومتریک ۳بعدی">
           <svg viewBox="0 0 24 24"><path d="M21 16.5l-9 5.25-9-5.25V7.5l9-5.25 9 5.25v9zM12 4.15L5.04 8.2 12 12.25l6.96-4.05L12 4.15zM4.5 9.8v6.7l6.75 3.94V13.7L4.5 9.8zm15 0l-6.75 3.9v6.74l6.75-3.94V9.8z"/></svg>
           <span>3D</span>
         </button>
 
-        <!-- Top (2D) View -->
-        <button class="cad-tool-btn" id="viewTopBtn" title="نمای بالا (۲بعدی)">
+        <button class="nav-icon-btn" id="viewTopBtn" title="نمای بالا (۲بعدی)">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="3" fill="currentColor"/><path d="M12 1v4M12 19v4M1 12h4M19 12h4" stroke="currentColor" stroke-width="2"/></svg>
           <span>بالا</span>
         </button>
 
-        <!-- Front View -->
-        <button class="cad-tool-btn" id="viewFrontBtn" title="نمای روبرو">
+        <button class="nav-icon-btn" id="viewFrontBtn" title="نمای روبرو">
           <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="3" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2"/></svg>
           <span>روبرو</span>
         </button>
 
-        <!-- Side View -->
-        <button class="cad-tool-btn" id="viewSideBtn" title="نمای پهلو">
+        <button class="nav-icon-btn" id="viewSideBtn" title="نمای پهلو">
           <svg viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="4" x2="12" y2="20" stroke="currentColor" stroke-width="2"/></svg>
           <span>پهلو</span>
         </button>
 
-        <div class="cad-toolbar-divider"></div>
+        <div class="nav-sep"></div>
 
-        <!-- Reset / Fit Camera -->
-        <button class="cad-tool-btn" id="resetCamBtn" title="برازش دید و مرکز">
+        <button class="nav-icon-btn" id="resetCamBtn" title="برازش دید و مرکز">
           <svg viewBox="0 0 24 24"><path d="M3 5v4h2V5h4V3H5c-1.1 0-2 .9-2 2zm2 10H3v4c0 1.1.9 2 2 2h4v-2H5v-4zm14 4h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zm0-16h-4v2h4v4h2V5c0-1.1-.9-2-2-2zM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg>
         </button>
 
-        <!-- Toggle CAD Edges -->
-        <button class="cad-tool-btn active" id="toggleEdgesBtn" title="خطوط لبه دندانه‌ها">
+        <button class="nav-icon-btn active" id="toggleEdgesBtn" title="خطوط لبه CAD">
           <svg viewBox="0 0 24 24"><polygon points="12,2 22,8.5 22,15.5 12,22 2,15.5 2,8.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
         </button>
 
-        <!-- Toggle Dimensions -->
-        <button class="cad-tool-btn active" id="toggleDimsBtn" title="اندازه‌گذاری مهندسی">
+        <button class="nav-icon-btn active" id="toggleDimsBtn" title="اندازه‌گذاری مهندسی">
           <svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 10H3V8h2v4h2V8h2v2h2V8h2v4h2V8h2v2h2V8h3v8z"/></svg>
         </button>
 
-        <!-- Simulation Run / Pause -->
-        <button class="cad-tool-btn" id="simPlayBtn" title="شروع / توقف چرخش">
+        <button class="nav-icon-btn" id="simPlayBtn" title="شروع / توقف چرخش">
           <svg viewBox="0 0 24 24" id="simPlayIcon"><polygon points="8,5 19,12 8,19"/></svg>
         </button>
       </div>
 
-      <!-- Bottom-Left Realtime CAD Specs Badge -->
-      <div class="cad-spec-badge" id="cadSpecBadge">
-        <div class="spec-item"><span class="spec-label">m:</span><span class="spec-val" id="badgeModule">2.5</span></div>
-        <div class="spec-item"><span class="spec-label">Z:</span><span class="spec-val" id="badgeTeeth">24</span></div>
-        <div class="spec-item"><span class="spec-label">d_p:</span><span class="spec-val" id="badgePitch">60.0 mm</span></div>
-        <div class="spec-item"><span class="spec-label">d_a:</span><span class="spec-val" id="badgeOuter">65.0 mm</span></div>
-        <div class="spec-item"><span class="spec-label">B:</span><span class="spec-val" id="badgeWidth">15.0 mm</span></div>
+      <!-- Realtime Engineering HUD Chips -->
+      <div class="cad-hud-overlay" id="cadHudOverlay">
+        <div class="hud-chip"><span class="chip-k">z:</span><span class="chip-v" id="hudTeeth">34</span></div>
+        <div class="hud-chip"><span class="chip-k">m:</span><span class="chip-v" id="hudModule">2.0</span></div>
+        <div class="hud-chip"><span class="chip-k">d_p:</span><span class="chip-v" id="hudPitch">68.0 mm</span></div>
+        <div class="hud-chip"><span class="chip-k">d_a:</span><span class="chip-v" id="hudOuter">72.0 mm</span></div>
+        <div class="hud-chip"><span class="chip-k">b:</span><span class="chip-v" id="hudWidth">10.0 mm</span></div>
       </div>
     </section>
 
-    <!-- BOTTOM HALF: Settings & Engineering Configuration (Scrollable Panel) -->
-    <section class="controls-section" id="controlsSection">
+    <!-- BOTTOM 50%: Native CAD Control Deck -->
+    <section class="cad-deck-container" id="deckContainer">
 
-      <!-- Navigation Tabs -->
-      <div class="tabs-header">
-        <button class="tab-btn active" data-tab="tab-gear">
+      <!-- Navigation Tabs (Native Segmented Tab Bar) -->
+      <nav class="cad-tab-bar">
+        <button class="cad-tab-item active" data-tab="tab-gear">
           <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
           <span>دنده</span>
         </button>
 
-        <button class="tab-btn" data-tab="tab-bore">
-          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><rect x="10.5" y="6" width="3" height="4" fill="currentColor"/></svg>
-          <span>شفت و خار</span>
+        <button class="cad-tab-item" data-tab="tab-bore">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg>
+          <span>شفت و پیچ</span>
         </button>
 
-        <button class="tab-btn" data-tab="tab-train">
+        <button class="cad-tab-item" data-tab="tab-train">
           <svg viewBox="0 0 24 24"><circle cx="8" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="16" cy="15" r="5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 12l2 2"/></svg>
-          <span>مونتاژ و دور</span>
+          <span>مونتاژ / درگیری</span>
         </button>
 
-        <button class="tab-btn" data-tab="tab-material">
+        <button class="cad-tab-item" data-tab="tab-material">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10V2z" fill="currentColor"/></svg>
           <span>متریال</span>
         </button>
 
-        <button class="tab-btn" data-tab="tab-export">
+        <button class="cad-tab-item" data-tab="tab-export">
           <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
           <span>خروجی و ارسال</span>
         </button>
 
-        <button class="tab-btn" data-tab="tab-update">
+        <button class="cad-tab-item" data-tab="tab-update">
           <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
           <span>آپدیت</span>
         </button>
-      </div>
+      </nav>
 
-      <!-- Tab 1: Gear Parameters (مشخصات دنده) -->
-      <div class="tab-content active" id="tab-gear">
-        <!-- Active Gear Selector (for Multi-Gear Assembly) -->
-        <div class="form-group" id="gearSelectorGroup">
-          <label class="form-label">
-            <span>چرخ‌دنده منتخب جهت ویرایش:</span>
+      <!-- Panel Content 1: Gear Parameters (NO SLIDERS - Native Steppers + Keyboard) -->
+      <div class="cad-panel-content active" id="tab-gear">
+        <!-- Gear Type Selector Segment -->
+        <div class="native-segmented-group">
+          <label class="seg-btn active">
+            <input type="radio" name="gearType" value="spur" checked>
+            <span>ساده (Spur)</span>
           </label>
-          <select id="activeGearSelector" class="form-select"></select>
+          <label class="seg-btn">
+            <input type="radio" name="gearType" value="rack_pinion">
+            <span>رک و پینیون (Rack & Pinion)</span>
+          </label>
+          <label class="seg-btn">
+            <input type="radio" name="gearType" value="helical">
+            <span>مارپیچ (Helical)</span>
+          </label>
+          <label class="seg-btn">
+            <input type="radio" name="gearType" value="bevel">
+            <span>مخروطی (Bevel)</span>
+          </label>
         </div>
 
-        <!-- Gear Type -->
-        <div class="form-group">
-          <label class="form-label">
-            <span>نوع چرخ‌دنده (Gear Type):</span>
-          </label>
-          <div class="type-pill-selector">
-            <label class="pill-option active">
-              <input type="radio" name="gearType" value="spur" checked>
-              <span>ساده (Spur)</span>
-            </label>
-            <label class="pill-option">
-              <input type="radio" name="gearType" value="helical">
-              <span>مارپیچ (Helical)</span>
-            </label>
-            <label class="pill-option">
-              <input type="radio" name="gearType" value="rack">
-              <span>شانه‌ای (Rack)</span>
-            </label>
-            <label class="pill-option">
-              <input type="radio" name="gearType" value="bevel">
-              <span>مخروطی (Bevel)</span>
-            </label>
+        <!-- Teeth (z) -->
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">تعداد دندانه (Teeth - Z)</span>
+            <span class="stepper-badge">دندانه</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="numTeethInput">−</button>
+            <input type="number" id="numTeethInput" inputmode="numeric" value="34" min="4" max="250" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="numTeethInput">+</button>
           </div>
         </div>
 
         <!-- Module (m) -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>مدول استاندارد (Module - m):</span>
-            <span class="val-display" id="moduleVal">2.5 mm</span>
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">مدول استاندارد (Module - m)</span>
+            <span class="stepper-badge">mm</span>
           </div>
-          <div class="range-row">
-            <input type="range" id="moduleRange" min="0.5" max="10" step="0.25" value="2.5" class="form-range">
-            <input type="number" id="moduleInput" min="0.1" max="50" step="0.1" value="2.5" class="form-input num-input">
-          </div>
-        </div>
-
-        <!-- Number of Teeth (Z) -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>تعداد دندانه (Teeth - Z):</span>
-            <span class="val-display" id="numTeethVal">24</span>
-          </div>
-          <div class="range-row">
-            <input type="range" id="numTeethRange" min="6" max="120" step="1" value="24" class="form-range">
-            <input type="number" id="numTeethInput" min="4" max="250" step="1" value="24" class="form-input num-input">
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="moduleInput" data-step="0.25">−</button>
+            <input type="number" id="moduleInput" inputmode="decimal" value="2.0" min="0.1" max="40" step="0.25" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="moduleInput" data-step="0.25">+</button>
           </div>
         </div>
 
-        <!-- Pressure Angle (alpha) -->
-        <div class="form-group">
-          <label class="form-label">
-            <span>زاویه فشار استاندارد (Pressure Angle - α):</span>
-          </label>
-          <div class="radio-button-group">
-            <label class="radio-label">
-              <input type="radio" name="pressureAngle" value="14.5">
-              <span>14.5° (قدیمی)</span>
-            </label>
-            <label class="radio-label active">
-              <input type="radio" name="pressureAngle" value="20" checked>
-              <span>20° (استاندارد ISO)</span>
-            </label>
-            <label class="radio-label">
-              <input type="radio" name="pressureAngle" value="25">
-              <span>25° (قدرتی)</span>
-            </label>
+        <!-- Face Width (b) -->
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">ضخامت / پهنای دندانه (Face Width - b)</span>
+            <span class="stepper-badge">mm</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="faceWidthInput" data-step="1">−</button>
+            <input type="number" id="faceWidthInput" inputmode="decimal" value="10" min="1" max="200" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="faceWidthInput" data-step="1">+</button>
           </div>
         </div>
 
-        <!-- Face Width (Thickness) -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>پهنا / ضخامت دندانه (Face Width - B):</span>
-            <span class="val-display" id="faceWidthVal">15 mm</span>
+        <!-- Pressure Angle (a) -->
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">زاویه فشار (Pressure Angle - α)</span>
+            <span class="stepper-badge">درجه</span>
           </div>
-          <div class="range-row">
-            <input type="range" id="faceWidthRange" min="2" max="100" step="1" value="15" class="form-range">
-            <input type="number" id="faceWidthInput" min="1" max="200" step="1" value="15" class="form-input num-input">
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="pressureAngleInput" data-step="1">−</button>
+            <input type="number" id="pressureAngleInput" inputmode="decimal" value="20" min="10" max="35" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="pressureAngleInput" data-step="1">+</button>
+          </div>
+        </div>
+
+        <!-- Backlash (j) - Swiss3D standard -->
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">لقّی دندانه‌ها (Backlash / Spiel - j)</span>
+            <span class="stepper-badge">mm</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="backlashInput" data-step="0.05">−</button>
+            <input type="number" id="backlashInput" inputmode="decimal" value="0.15" min="0" max="2.0" step="0.05" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="backlashInput" data-step="0.05">+</button>
+          </div>
+        </div>
+
+        <!-- Rack Teeth (conditional for Rack & Pinion) -->
+        <div class="cad-stepper-card" id="rackTeethCard" style="display: none;">
+          <div class="stepper-meta">
+            <span class="stepper-title">تعداد دندانه‌های شانه (Rack Teeth)</span>
+            <span class="stepper-badge">دندانه</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="rackTeethInput" data-step="1">−</button>
+            <input type="number" id="rackTeethInput" inputmode="numeric" value="24" min="6" max="100" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="rackTeethInput" data-step="1">+</button>
           </div>
         </div>
 
         <!-- Helical Angle (conditional) -->
-        <div class="form-group" id="helicalAngleGroup" style="display: none;">
-          <div class="form-label">
-            <span>زاویه مارپیچ (Helix Angle - β):</span>
-            <span class="val-display" id="helixAngleVal">15°</span>
+        <div class="cad-stepper-card" id="helicalCard" style="display: none;">
+          <div class="stepper-meta">
+            <span class="stepper-title">زاویه مارپیچ (Helix Angle - β)</span>
+            <span class="stepper-badge">درجه</span>
           </div>
-          <input type="range" id="helixAngleRange" min="5" max="45" step="1" value="15" class="form-range">
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="helicalAngleInput" data-step="1">−</button>
+            <input type="number" id="helicalAngleInput" inputmode="decimal" value="15" min="5" max="45" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="helicalAngleInput" data-step="1">+</button>
+          </div>
         </div>
 
         <!-- Bevel Angle (conditional) -->
-        <div class="form-group" id="bevelAngleGroup" style="display: none;">
-          <div class="form-label">
-            <span>زاویه مخروط (Pitch Cone Angle):</span>
-            <span class="val-display" id="bevelAngleVal">25°</span>
+        <div class="cad-stepper-card" id="bevelCard" style="display: none;">
+          <div class="stepper-meta">
+            <span class="stepper-title">زاویه مخروط (Pitch Cone Angle)</span>
+            <span class="stepper-badge">درجه</span>
           </div>
-          <input type="range" id="bevelAngleRange" min="10" max="60" step="1" value="25" class="form-range">
-        </div>
-      </div>
-
-      <!-- Tab 2: Bore, Keyway & Hub (شفت، خار و نافی) -->
-      <div class="tab-content" id="tab-bore">
-        <!-- Bore Diameter -->
-        <div class="form-group">
-          <div class="form-label">
-            <span>قطر سوراخ شفت (Bore Diameter - d_b):</span>
-            <span class="val-display" id="boreDiaVal">12 mm</span>
-          </div>
-          <div class="range-row">
-            <input type="range" id="boreDiaRange" min="0" max="60" step="1" value="12" class="form-range">
-            <input type="number" id="boreDiaInput" min="0" max="150" step="1" value="12" class="form-input num-input">
-          </div>
-        </div>
-
-        <!-- Keyway (DIN 6885) -->
-        <div class="card-box">
-          <label class="checkbox-label">
-            <input type="checkbox" id="hasKeywayCheck" checked>
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-text">ایجاد جاخار استاندارد شفت (DIN 6885 Keyway)</span>
-          </label>
-
-          <div id="keywaySettings">
-            <div class="form-row-2">
-              <div class="form-group">
-                <span class="sub-label">عرض جاخار (Width - b):</span>
-                <input type="number" id="keywayWidthInput" min="1" max="25" step="0.5" value="4" class="form-input">
-              </div>
-              <div class="form-group">
-                <span class="sub-label">عمق جاخار (Depth - t):</span>
-                <input type="number" id="keywayDepthInput" min="0.5" max="15" step="0.5" value="2.5" class="form-input">
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Hub (نافی) -->
-        <div class="card-box">
-          <label class="checkbox-label">
-            <input type="checkbox" id="hasHubCheck" checked>
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-text">ایجاد نافی برآمده (Hub Extension)</span>
-          </label>
-
-          <div id="hubSettings">
-            <div class="form-row-2">
-              <div class="form-group">
-                <span class="sub-label">قطر نافی (Hub Dia):</span>
-                <input type="number" id="hubDiaInput" min="5" max="150" step="1" value="26" class="form-input">
-              </div>
-              <div class="form-group">
-                <span class="sub-label">طول نافی (Hub Length):</span>
-                <input type="number" id="hubLengthInput" min="2" max="100" step="1" value="12" class="form-input">
-              </div>
-            </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="bevelAngleInput" data-step="1">−</button>
+            <input type="number" id="bevelAngleInput" inputmode="decimal" value="25" min="10" max="60" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="bevelAngleInput" data-step="1">+</button>
           </div>
         </div>
       </div>
 
-      <!-- Tab 3: Kinematics & Gear Assembly (مونتاژ و دورسنج) -->
-      <div class="tab-content" id="tab-train">
-        <div class="card-box">
-          <label class="checkbox-label">
-            <input type="checkbox" id="enableGearTrainCheck">
-            <span class="checkbox-custom"></span>
-            <span class="checkbox-text">فعال‌سازی قطار دنده‌ها (۲ چرخ‌دنده درگیر)</span>
-          </label>
+      <!-- Panel Content 2: Bore, Hub & Setscrew (NO KEYWAY) -->
+      <div class="cad-panel-content" id="tab-bore">
+        <!-- Center Bore Diameter (bd) -->
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">قطر سوراخ شفت (Bore Diameter - bd)</span>
+            <span class="stepper-badge">mm</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="boreDiaInput" data-step="1">−</button>
+            <input type="number" id="boreDiaInput" inputmode="decimal" value="8" min="0" max="100" step="1" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="boreDiaInput" data-step="1">+</button>
+          </div>
         </div>
 
-        <div id="gearTrainControls" style="display: none;">
-          <!-- Driver RPM -->
-          <div class="form-group">
-            <div class="form-label">
-              <span>دور در دقیقه چرخ‌دنده محرک (Driver RPM):</span>
-              <span class="val-display" id="driverRpmVal">3000 RPM</span>
+        <!-- Hub (نافی برآمده) -->
+        <div class="native-card-section">
+          <label class="native-switch-row">
+            <span class="switch-title">ایجاد نافی برآمده (Hub Extension)</span>
+            <input type="checkbox" id="hasHubCheck" checked class="native-switch">
+          </label>
+
+          <div id="hubControls">
+            <div class="cad-stepper-card" style="margin-top: 8px;">
+              <div class="stepper-meta">
+                <span class="stepper-title">قطر بیرونی نافی (Hub Diameter)</span>
+                <span class="stepper-badge">mm</span>
+              </div>
+              <div class="stepper-controls">
+                <button class="step-btn" data-action="dec" data-target="hubDiaInput" data-step="1">−</button>
+                <input type="number" id="hubDiaInput" inputmode="decimal" value="22" min="5" max="150" step="1" class="step-input">
+                <button class="step-btn" data-action="inc" data-target="hubDiaInput" data-step="1">+</button>
+              </div>
             </div>
-            <div class="range-row">
-              <input type="range" id="driverRpmRange" min="10" max="6000" step="50" value="3000" class="form-range">
-              <input type="number" id="driverRpmInput" min="1" max="20000" step="10" value="3000" class="form-input num-input">
+
+            <div class="cad-stepper-card">
+              <div class="stepper-meta">
+                <span class="stepper-title">طول نافی (Hub Length)</span>
+                <span class="stepper-badge">mm</span>
+              </div>
+              <div class="stepper-controls">
+                <button class="step-btn" data-action="dec" data-target="hubLengthInput" data-step="1">−</button>
+                <input type="number" id="hubLengthInput" inputmode="decimal" value="12" min="2" max="100" step="1" class="step-input">
+                <button class="step-btn" data-action="inc" data-target="hubLengthInput" data-step="1">+</button>
+              </div>
             </div>
           </div>
+        </div>
 
-          <!-- Kinematics Summary Table -->
-          <div class="kinematics-table-card">
-            <table class="cad-table">
-              <thead>
-                <tr>
-                  <th>دنده</th>
-                  <th>دندانه</th>
-                  <th>دور (RPM)</th>
-                  <th>نسبت ($i$)</th>
-                  <th>جهت</th>
-                </tr>
-              </thead>
-              <tbody id="kinematicsTableBody"></tbody>
-            </table>
-          </div>
+        <!-- Perpendicular Setscrew Hole (سوراخ پیچ عمود به شفت) -->
+        <div class="native-card-section">
+          <label class="native-switch-row">
+            <span class="switch-title">جای پیچ مغزی عمود به سوراخ وسط (Setscrew Hole)</span>
+            <input type="checkbox" id="hasSetscrewCheck" checked class="native-switch">
+          </label>
 
-          <!-- Position (X, Y) of active gear -->
-          <div class="form-row-2" style="margin-top: 10px;">
-            <div class="form-group">
-              <span class="sub-label">موقعیت افقی X (mm):</span>
-              <input type="number" id="gearPosXInput" value="0" step="1" class="form-input">
+          <div id="setscrewControls">
+            <div class="cad-stepper-card" style="margin-top: 8px;">
+              <div class="stepper-meta">
+                <span class="stepper-title">سایز سوراخ پیچ مغزی (Setscrew Size)</span>
+                <span class="stepper-badge">رزوه / mm</span>
+              </div>
+              <div class="stepper-controls">
+                <button class="step-btn" data-action="dec" data-target="setscrewSizeInput" data-step="1">−</button>
+                <input type="number" id="setscrewSizeInput" inputmode="decimal" value="4" min="2" max="12" step="1" class="step-input" placeholder="M4">
+                <button class="step-btn" data-action="inc" data-target="setscrewSizeInput" data-step="1">+</button>
+              </div>
             </div>
-            <div class="form-group">
-              <span class="sub-label">موقعیت عمودی Y (mm):</span>
-              <input type="number" id="gearPosYInput" value="0" step="1" class="form-input">
+
+            <div class="cad-stepper-card">
+              <div class="stepper-meta">
+                <span class="stepper-title">فاصله از لبه‌ی بیرونی نافی (Dist from Edge)</span>
+                <span class="stepper-badge">mm</span>
+              </div>
+              <div class="stepper-controls">
+                <button class="step-btn" data-action="dec" data-target="setscrewDistInput" data-step="0.5">−</button>
+                <input type="number" id="setscrewDistInput" inputmode="decimal" value="4" min="1" max="50" step="0.5" class="step-input">
+                <button class="step-btn" data-action="inc" data-target="setscrewDistInput" data-step="0.5">+</button>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tab 4: Materials & Shading (متریال) -->
-      <div class="tab-content" id="tab-material">
-        <div class="material-grid">
-          <button class="mat-card active" data-material="metal">
-            <div class="mat-preview mat-steel"></div>
-            <span>فولاد متالیک (Steel)</span>
+      <!-- Panel Content 3: Assembly & Kinematics (درگیری و شبیه‌سازی) -->
+      <div class="cad-panel-content" id="tab-train">
+        <div class="native-card-section" id="rackPinionInfoBox" style="display: none;">
+          <h4 style="font-size: 13px; font-weight: 700; color: #10b981; margin-bottom: 4px;">شبیه‌سازی مکانیزم رک و پینیون (Rack & Pinion)</h4>
+          <p style="font-size: 11px; color: var(--app-text-muted); line-height: 1.5;">پینیون و شانه دنده به صورت فیزیکی درگیر شده‌اند. با زدن دکمه پخش، پینیون می‌چرخد و شانه دنده با سرعت خطی دقیق $v = \omega \cdot r$ حرکت می‌کند.</p>
+        </div>
+
+        <div class="cad-stepper-card">
+          <div class="stepper-meta">
+            <span class="stepper-title">سرعت چرخش پینیون / دنده (Driver RPM)</span>
+            <span class="stepper-badge">RPM</span>
+          </div>
+          <div class="stepper-controls">
+            <button class="step-btn" data-action="dec" data-target="driverRpmInput" data-step="100">−</button>
+            <input type="number" id="driverRpmInput" inputmode="numeric" value="600" min="10" max="10000" step="50" class="step-input">
+            <button class="step-btn" data-action="inc" data-target="driverRpmInput" data-step="100">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel Content 4: Materials & Rendering -->
+      <div class="cad-panel-content" id="tab-material">
+        <div class="native-mat-grid">
+          <button class="native-mat-pill active" data-mat="metal">
+            <span class="mat-dot" style="background: linear-gradient(135deg, #64748b, #334155);"></span>
+            <span>فولاد مهندسی (Steel)</span>
           </button>
-          <button class="mat-card" data-material="brass">
-            <div class="mat-preview mat-brass"></div>
+          <button class="native-mat-pill" data-mat="brass">
+            <span class="mat-dot" style="background: linear-gradient(135deg, #f59e0b, #b45309);"></span>
             <span>برنج طلایی (Brass)</span>
           </button>
-          <button class="mat-card" data-material="aluminum">
-            <div class="mat-preview mat-aluminum"></div>
+          <button class="native-mat-pill" data-mat="aluminum">
+            <span class="mat-dot" style="background: linear-gradient(135deg, #f1f5f9, #94a3b8);"></span>
             <span>آلومینیوم (Aluminum)</span>
           </button>
-          <button class="mat-card" data-material="plastic">
-            <div class="mat-preview mat-plastic"></div>
-            <span>پلیمر مهندسی (Polymer)</span>
+          <button class="native-mat-pill" data-mat="plastic">
+            <span class="mat-dot" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);"></span>
+            <span>پلیمر (Polymer)</span>
           </button>
-          <button class="mat-card" data-material="wireframe">
-            <div class="mat-preview mat-wire"></div>
+          <button class="native-mat-pill" data-mat="wireframe">
+            <span class="mat-dot" style="border: 2px dashed #38bdf8; background: transparent;"></span>
             <span>مشبک (Wireframe)</span>
           </button>
         </div>
 
-        <div class="form-group" style="margin-top: 14px;">
-          <label class="form-label">
-            <span>رنگ سفارشی چرخ‌دنده:</span>
-          </label>
-          <div class="color-picker-row">
-            <input type="color" id="gearColorPicker" value="#3b82f6" class="color-input">
+        <div class="native-card-section" style="margin-top: 10px;">
+          <label style="font-size: 12px; font-weight: 700; display: block; margin-bottom: 6px;">رنگ قطعه در محیط سه‌بعدی:</label>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <input type="color" id="gearColorPicker" value="#3b82f6" class="native-color-picker">
             <span id="gearColorHex" style="font-family: monospace; font-size: 13px;">#3b82f6</span>
           </div>
         </div>
       </div>
 
-      <!-- Tab 5: Export & Native Share (خروجی و ارسال فایل) -->
-      <div class="tab-content" id="tab-export">
-        <!-- Big Prominent Share Button -->
-        <button class="btn btn-primary btn-large btn-full" id="bigShareBtn">
+      <!-- Panel Content 5: Export & Native Share -->
+      <div class="cad-panel-content" id="tab-export">
+        <!-- Prominent Native Share Button -->
+        <button class="native-btn-hero" id="heroShareBtn">
           <svg viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-          <span>ارسال مستقیم فایل به برنامه‌های گوشی (تلگرام، واتساپ و...)</span>
+          <span>ارسال مستقیم فایل به برنامه‌های گوشی</span>
         </button>
 
-        <div class="divider-text">یا دانلود مستقیم فایل‌ها</div>
+        <div class="native-section-divider">دانلود مستقیم فایل‌های مهندسی</div>
 
-        <div class="export-cards-grid">
-          <!-- STL 3D Print Card -->
-          <div class="export-card">
-            <div class="export-header">
-              <span class="export-badge">3D Mesh</span>
-              <h4>خروجی STL استاندارد</h4>
+        <div class="native-export-stack">
+          <!-- STL -->
+          <div class="native-export-item">
+            <div class="export-meta">
+              <span class="export-tag tag-stl">3D STL</span>
+              <div class="export-details">
+                <strong>خروجی STL استاندارد توپر</strong>
+                <small>۱۰۰٪ Watertight و Manifold مناسب اسلایسر Cura، Prusa، بامبو و پرینترهای سه‌بعدی</small>
+              </div>
             </div>
-            <p>مدل سه‌بعدی توپر (Watertight Manifold) مناسب پرینت ۳بعدی، Cura، Prusa و اسلایسرها.</p>
-            <button class="btn btn-export" id="downloadStlBtn">
+            <button class="native-sub-btn" id="downloadStlBtn">
               <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              <span>دانلود فایل STL</span>
+              <span>دانلود STL</span>
             </button>
           </div>
 
-          <!-- STEP ISO 10303 Card -->
-          <div class="export-card">
-            <div class="export-header">
-              <span class="export-badge">3D CAD</span>
-              <h4>خروجی STEP / STP</h4>
+          <!-- STEP -->
+          <div class="native-export-item">
+            <div class="export-meta">
+              <span class="export-tag tag-step">3D STEP</span>
+              <div class="export-details">
+                <strong>خروجی STEP / STP سالید CAD</strong>
+                <small>استاندارد ISO 10303-21 قابل بازگشایی و ویرایش در SolidWorks، CATIA، فیوژن ۳۶۰ و FreeCAD</small>
+              </div>
             </div>
-            <p>مدل سه‌بعدی استاندارد ISO 10303-21 قابل بازگشایی و ویرایش سالید در SolidWorks، CATIA و FreeCAD.</p>
-            <button class="btn btn-export" id="downloadStepBtn">
+            <button class="native-sub-btn" id="downloadStepBtn">
               <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              <span>دانلود فایل STEP</span>
+              <span>دانلود STEP</span>
             </button>
           </div>
 
-          <!-- DXF AutoCAD Card -->
-          <div class="export-card">
-            <div class="export-header">
-              <span class="export-badge">2D CAD</span>
-              <h4>خروجی AutoCAD DXF</h4>
+          <!-- DXF -->
+          <div class="native-export-item">
+            <div class="export-meta">
+              <span class="export-tag tag-dxf">2D DXF</span>
+              <div class="export-details">
+                <strong>خروجی اتوکد DXF دوبعدی</strong>
+                <small>پلی‌لاین بسته کانتور دندانه‌ها، سوراخ شفت و دایره گام برای برش لیزر، پلاسما و وایرکات CNC</small>
+              </div>
             </div>
-            <p>نقشه مهندسی دوبعدی شامل دنده‌ها، سوراخ شفت، جاخار و دایره گام برای برش لیزر، پلاسما و CNC.</p>
-            <button class="btn btn-export" id="downloadDxfBtn">
+            <button class="native-sub-btn" id="downloadDxfBtn">
               <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-              <span>دانلود فایل DXF</span>
+              <span>دانلود DXF</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- Tab 6: In-App Update (بررسی آپدیت) -->
-      <div class="tab-content" id="tab-update">
-        <div class="update-box">
-          <div class="update-icon">
+      <!-- Panel Content 6: In-App Update Engine -->
+      <div class="cad-panel-content" id="tab-update">
+        <div class="native-card-section update-center-card">
+          <div class="update-pulse-icon">
             <svg viewBox="0 0 24 24"><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM17 13l-5 5-5-5h3V9h4v4h3z"/></svg>
           </div>
-          <h3>سیستم خودکار به‌روزرسانی اپلیکیشن</h3>
-          <p>با کلیک روی دکمه زیر، وضعیت آخرین بیلد و نسخه APK کامپایل شده روی مخزن گیت‌هاب بررسی می‌شود.</p>
+          <h3 style="font-size: 15px; font-weight: 700; margin-top: 6px;">به‌روزرسانی خودکار اپلیکیشن (GitHub Releases)</h3>
+          <p style="font-size: 12px; color: var(--app-text-muted); margin: 6px 0 14px 0;">بررسی و دانلود مستقیم فایل APK از گیت‌هاب بدون نیاز به ورود به حساب کاربری.</p>
 
-          <button class="btn btn-primary btn-large" id="checkUpdateActionBtn">
+          <button class="native-btn-hero" id="checkUpdateActionBtn">
             <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46A7.93 7.93 0 0 0 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74A7.93 7.93 0 0 0 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-            <span>بررسی نسخه جدید در گیت‌هاب</span>
+            <span>بررسی و دانلود آخرین نسخه APK</span>
           </button>
 
-          <div id="updateStatusCard" class="update-status-card" style="display: none;">
-            <div id="updateStatusMsg"></div>
-            <div id="updateActionArea"></div>
+          <div id="updateStatusBox" class="update-result-card" style="display: none;">
+            <div id="updateStatusText"></div>
+            <div id="updateBtnContainer"></div>
           </div>
         </div>
       </div>
@@ -481,62 +481,75 @@
     </section>
   </main>
 
-  <!-- MODAL: Share File via Native Mobile Share Sheet (انتخاب دنده و فرمت) -->
-  <div class="modal-backdrop" id="shareModal">
-    <div class="modal-card">
-      <div class="modal-header">
-        <div class="modal-title-row">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="#3b82f6"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
-          <h3>ارسال و اشتراک‌گذاری فایل مهندسی</h3>
+  <!-- MODAL: Native File Share Sheet Dialog -->
+  <div class="native-modal-backdrop" id="shareModal">
+    <div class="native-modal-sheet">
+      <div class="modal-sheet-header">
+        <div class="sheet-title-row">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="#3b82f6"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/></svg>
+          <h3>ارسال فایل مهندسی به برنامه‌های گوشی</h3>
         </div>
-        <button class="modal-close" id="closeShareModalBtn">&times;</button>
+        <button class="sheet-close-btn" id="closeShareModalBtn">&times;</button>
       </div>
 
-      <div class="modal-body">
-        <!-- Select Gear -->
-        <div class="form-group">
-          <label class="form-label"><span>۱. انتخاب چرخ‌دنده:</span></label>
-          <select id="modalShareGearSelect" class="form-select"></select>
-        </div>
-
-        <!-- Select Format -->
-        <div class="form-group">
-          <label class="form-label"><span>۲. فرمت فایل ارسالی:</span></label>
-          <div class="format-choice-list">
-            <label class="format-radio active">
-              <input type="radio" name="modalShareFormat" value="stl" checked>
-              <div class="format-info">
-                <strong>STL (مدل سه‌بعدی پرینت / Mesh)</strong>
-                <small>مناسب ارسال به اپ‌های تلگرام، واتساپ، اسلایسر موبایل و ذخیره در درایو</small>
-              </div>
+      <div class="modal-sheet-body">
+        <!-- Target Selection (Pinion, Rack, or Gear) -->
+        <div class="native-card-section" id="targetPartSection" style="display: none;">
+          <label style="font-size: 11px; font-weight: 700; margin-bottom: 6px; display: block;">کدام بخش مکانیزم ارسال شود؟</label>
+          <div class="native-segmented-group">
+            <label class="seg-btn active">
+              <input type="radio" name="sharePartChoice" value="pinion" checked>
+              <span>پینیون (Pinion)</span>
             </label>
-
-            <label class="format-radio">
-              <input type="radio" name="modalShareFormat" value="step">
-              <div class="format-info">
-                <strong>STEP / STP (مدل سه‌بعدی سالید CAD)</strong>
-                <small>فرمت رسمی مهندسی سالیدورکز، کتیا، فیوژن ۳۶۰ و FreeCAD</small>
-              </div>
+            <label class="seg-btn">
+              <input type="radio" name="sharePartChoice" value="rack">
+              <span>شانه دنده (Rack)</span>
             </label>
-
-            <label class="format-radio">
-              <input type="radio" name="modalShareFormat" value="dxf">
-              <div class="format-info">
-                <strong>DXF (نقشه دوبعدی CNC و برش لیزر)</strong>
-                <small>مناسب کارگاه‌های CNC، برش لیزر، وایرکات و اتوکد</small>
-              </div>
+            <label class="seg-btn">
+              <input type="radio" name="sharePartChoice" value="both">
+              <span>هر دو (Assembly)</span>
             </label>
           </div>
         </div>
 
-        <!-- Action Button -->
-        <button class="btn btn-primary btn-large btn-full" id="confirmShareBtn">
+        <!-- Format Selection -->
+        <label style="font-size: 11px; font-weight: 700; margin-bottom: 6px; display: block;">فرمت فایل ارسالی:</label>
+        <div class="native-format-stack">
+          <label class="native-format-row active">
+            <input type="radio" name="modalShareFormat" value="stl" checked>
+            <div class="format-text">
+              <strong>STL (۳بعدی پرینت / Mesh)</strong>
+              <small>مناسب اشتراک در تلگرام، واتساپ، اسلایسر موبایل و ذخیره در درایو</small>
+            </div>
+          </label>
+
+          <label class="native-format-row">
+            <input type="radio" name="modalShareFormat" value="step">
+            <div class="format-text">
+              <strong>STEP / STP (۳بعدی سالید CAD)</strong>
+              <small>فرمت رسمی مهندسی سالیدورکز، کتیا، فیوژن ۳۶۰ و FreeCAD</small>
+            </div>
+          </label>
+
+          <label class="native-format-row">
+            <input type="radio" name="modalShareFormat" value="dxf">
+            <div class="format-text">
+              <strong>DXF (۲بعدی برش لیزر و CNC)</strong>
+              <small>مناسب کارگاه‌های CNC، برش لیزر، پلاسما و اتوکد</small>
+            </div>
+          </label>
+        </div>
+
+        <button class="native-btn-hero" id="confirmShareBtn" style="margin-top: 10px;">
           <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
           <span>باز شدن لیست برنامه‌های گوشی و ارسال</span>
         </button>
       </div>
     </div>
   </div>
+
+  <!-- In-App Floating Toast Notification -->
+  <div class="cad-toast-container" id="toastContainer"></div>
 
   <!-- Local Offline Scripts -->
   <script src="three.min.js"></script>
